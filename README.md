@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv()?;
 
     // Initialize and build CKAN struct
-    let ckan = ckan_dh_rs::CKAN::builder()
+    let ckan = ckanaction::CKAN::builder()
         .url("http://localhost:5000")
         .token(dotenvy::var("CKAN_API_TOKEN")?)
         .build();
