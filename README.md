@@ -2,6 +2,8 @@
 
 Rust library crate to access CKAN Action API endpoints through Rust builders. Based on the CKAN Action API v3. Endpoints are expected to return with an output of type `serde_json::Value`.
 
+![ckanaction IDE hints demo](https://github.com/user-attachments/assets/515d5742-4a33-43b9-9f3f-4795d18579c0)
+
 ## Examples
 
 Run `/package_list` endpoint with a limit of 5 results per page and print the output:
