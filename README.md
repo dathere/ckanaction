@@ -57,16 +57,16 @@ println!("{result:#?}");
 Create a new resource with a new file from a file path:
 
 ```rust
-    let path_buf = current_dir()?.join("data.csv");
-    let result = ckan
-        .resource_create()
-        .package_id("3mz0qhbb-cdb0-ewst-x7c0-casnkwv0edub".to_string())
-        .name("My new resource".to_string())
-        .format("CSV".to_string())
-        .upload(path_buf)
-        .call()
-        .await?;
-    println!("{result:#?}");
+let path_buf = current_dir()?.join("data.csv");
+let result = ckan
+    .resource_create()
+    .package_id("3mz0qhbb-cdb0-ewst-x7c0-casnkwv0edub".to_string())
+    .name("My new resource".to_string())
+    .format("CSV".to_string())
+    .upload(path_buf)
+    .call()
+    .await?;
+println!("{result:#?}");
 ```
 
 ## Notes
