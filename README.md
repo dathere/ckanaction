@@ -2,7 +2,9 @@
 
 Rust library crate to access CKAN Action API endpoints through Rust builders. Based on the CKAN Action API v3. Endpoints are expected to return with an output of type `serde_json::Value`.
 
-## Example
+## Examples
+
+Run `/status_show` endpoint for a CKAN instance and print the output:
 
 ```rust
 use dotenvy::dotenv;
@@ -24,6 +26,47 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+```
+
+> The following examples won't include the boilerplate code.
+
+List packages:
+
+```rust
+let result = ckan.package_list().call().await?;
+println!("{result:#?}");
+```
+
+Create a new package (dataset) with custom fields:
+
+```rust
+let custom_fields = serde_json::json!({
+    "data_contact_email": "support@dathere.com",
+    "update_frequency": "daily",
+    "related_resources": [],
+});
+let result = ckan.package_create()
+    .name("my-new-package".to_string())
+    .custom_fields(custom_fields)
+    .private(false)
+    .call()
+    .await?;
+println!("{result:#?}");
+```
+
+Create a new resource with a new file from a file path:
+
+```rust
+    let path_buf = current_dir()?.join("data.csv");
+    let result = ckan
+        .resource_create()
+        .package_id("3mz0qhbb-cdb0-ewst-x7c0-casnkwv0edub".to_string())
+        .name("My new resource".to_string())
+        .format("CSV".to_string())
+        .upload(path_buf)
+        .call()
+        .await?;
+    println!("{result:#?}");
 ```
 
 ## Notes

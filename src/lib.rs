@@ -1,6 +1,6 @@
 use bon::bon;
 use serde_json::json;
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 
 pub struct CKAN {
     url: String,
@@ -47,14 +47,28 @@ impl CKAN {
         &self,
         endpoint: String,
         body: Option<serde_json::Value>,
+        upload: Option<PathBuf>,
     ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
         let client = reqwest::Client::new();
         let mut req_builder = client.post(endpoint);
         if self.token.is_some() {
             req_builder = req_builder.header("Authorization", self.token.clone().unwrap());
         }
-        let res = req_builder.json(&body).send().await?.json().await?;
-        Ok(res)
+        if let Some(file_pathbuf) = upload {
+            let mut form = reqwest::multipart::Form::new();
+            if let Some(body_as_value) = body {
+                for entry in body_as_value.as_object().unwrap().iter() {
+                    form = form.text(entry.0.to_owned(), entry.1.as_str().unwrap().to_owned());
+                }
+            }
+            form = form.file("upload", file_pathbuf).await?;
+            req_builder = req_builder.multipart(form);
+            let res = req_builder.send().await?.json().await?;
+            Ok(res)
+        } else {
+            let res = req_builder.json(&body).send().await?.json().await?;
+            Ok(res)
+        }
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.package_list
@@ -1263,6 +1277,557 @@ impl CKAN {
         let endpoint = self.url.clone() + "/api/3/action/api_token_list";
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("user_id", json!(user_id));
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.package_create
+    #[builder]
+    pub async fn package_create(
+        &self,
+        name: String,
+        title: Option<String>,
+        private: bool,
+        author: Option<String>,
+        author_email: Option<String>,
+        maintainer: Option<String>,
+        maintainer_email: Option<String>,
+        license_id: Option<String>,
+        notes: Option<String>,
+        url: Option<String>,
+        version: Option<String>,
+        state: Option<String>,
+        _type: Option<String>,
+        resources: Option<Vec<serde_json::Value>>,
+        tags: Option<Vec<serde_json::Value>>,
+        extras: Option<Vec<serde_json::Value>>,
+        plugin_data: Option<serde_json::Value>,
+        relationships_as_object: Option<Vec<serde_json::Value>>,
+        relationships_as_subject: Option<Vec<serde_json::Value>>,
+        groups: Option<Vec<serde_json::Value>>,
+        owner_org: Option<String>,
+        custom_fields: Option<serde_json::Value>,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/package_create";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("name", json!(name));
+        opsert("title", title, &mut map);
+        map.insert("private", json!(private));
+        opsert("author", author, &mut map);
+        opsert("author_email", author_email, &mut map);
+        opsert("maintainer", maintainer, &mut map);
+        opsert("maintainer_email", maintainer_email, &mut map);
+        opsert("license_id", license_id, &mut map);
+        opsert("notes", notes, &mut map);
+        opsert("url", url, &mut map);
+        opsert("version", version, &mut map);
+        opsert("state", state, &mut map);
+        opsert("_type", _type, &mut map);
+        opsert("resources", resources, &mut map);
+        opsert("tags", tags, &mut map);
+        opsert("extras", extras, &mut map);
+        opsert("plugin_data", plugin_data, &mut map);
+        opsert("relationships_as_object", relationships_as_object, &mut map);
+        opsert(
+            "relationships_as_subject",
+            relationships_as_subject,
+            &mut map,
+        );
+        let mut custom_map: HashMap<String, serde_json::Value> = HashMap::new();
+        opsert("groups", groups, &mut map);
+        opsert("owner_org", owner_org, &mut map);
+        if let Some(custom) = custom_fields {
+            if custom.is_object() {
+                let custom_temp_map = custom.as_object().unwrap();
+                custom_map.extend(
+                    custom_temp_map
+                        .iter()
+                        .map(|item| (item.0.to_owned(), item.1.to_owned())),
+                );
+            }
+        }
+        map.extend(
+            custom_map
+                .iter()
+                .map(|item| (item.0.as_str(), item.1.to_owned())),
+        );
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.resource_create
+    #[builder]
+    pub async fn resource_create(
+        &self,
+        package_id: String,
+        url: Option<String>,
+        description: Option<String>,
+        format: Option<String>,
+        hash: Option<String>,
+        name: Option<String>,
+        resource_type: Option<String>,
+        mimetype: Option<String>,
+        mimetype_inner: Option<String>,
+        cache_url: Option<String>,
+        size: Option<i32>,
+        created: Option<String>,
+        last_modified: Option<String>,
+        cache_last_updated: Option<String>,
+        upload: Option<PathBuf>,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/resource_create";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("package_id", json!(package_id));
+        opsert("url", url, &mut map);
+        opsert("description", description, &mut map);
+        opsert("format", format, &mut map);
+        opsert("hash", hash, &mut map);
+        opsert("name", name, &mut map);
+        opsert("resource_type", resource_type, &mut map);
+        opsert("mimetype", mimetype, &mut map);
+        opsert("mimetype_inner", mimetype_inner, &mut map);
+        opsert("cache_url", cache_url, &mut map);
+        opsert("size", size, &mut map);
+        opsert("created", created, &mut map);
+        opsert("last_modified", last_modified, &mut map);
+        opsert("cache_last_updated", cache_last_updated, &mut map);
+
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .maybe_upload(upload)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.package_delete
+    #[builder]
+    pub async fn package_delete(
+        &self,
+        id: String,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/package_delete";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("id", json!(id));
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.resource_view_create
+    #[builder]
+    pub async fn resource_view_create(
+        &self,
+        resource_id: String,
+        title: String,
+        description: Option<String>,
+        view_type: String,
+        config: Option<String>,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/resource_view_create";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("resource_id", json!(resource_id));
+        map.insert("title", json!(title));
+        opsert("description", description, &mut map);
+        map.insert("view_type", json!(view_type));
+        opsert("config", config, &mut map);
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.create_default_resource_views
+    #[builder]
+    pub async fn create_default_resource_views(
+        &self,
+        resource: serde_json::Value,
+        package: Option<serde_json::Value>,
+        create_datastore_views: Option<bool>,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/create_default_resource_views";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("resource", resource);
+        opsert("package", package, &mut map);
+        opsert("create_datastore_views", create_datastore_views, &mut map);
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.package_create_default_resource_views
+    #[builder]
+    pub async fn package_create_default_resource_views(
+        &self,
+        package: serde_json::Value,
+        create_datastore_views: Option<bool>,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/package_create_default_resource_views";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("package", package);
+        opsert("create_datastore_views", create_datastore_views, &mut map);
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.package_relationship_create
+    #[builder]
+    pub async fn package_relationship_create(
+        &self,
+        subject: String,
+        object: String,
+        _type: String,
+        comment: Option<String>,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/package_relationship_create";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("subject", json!(subject));
+        map.insert("object", json!(object));
+        map.insert("type", json!(_type));
+        opsert("comment", comment, &mut map);
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.member_create
+    #[builder]
+    pub async fn member_create(
+        &self,
+        id: String,
+        object: String,
+        object_type: String,
+        capacity: String,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/member_create";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("id", json!(id));
+        map.insert("object", json!(object));
+        map.insert("object_type", json!(object_type));
+        map.insert("capacity", json!(capacity));
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.package_collaborator_create
+    #[builder]
+    pub async fn package_collaborator_create(
+        &self,
+        id: String,
+        user_id: String,
+        capacity: String,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/package_collaborator_create";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("id", json!(id));
+        map.insert("user_id", json!(user_id));
+        map.insert("capacity", json!(capacity));
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.group_create
+    #[builder]
+    pub async fn group_create(
+        &self,
+        name: String,
+        id: Option<String>,
+        title: Option<String>,
+        description: Option<String>,
+        image_url: Option<String>,
+        _type: Option<String>,
+        state: Option<String>,
+        approval_status: Option<String>,
+        extras: Option<Vec<serde_json::Value>>,
+        packages: Option<Vec<serde_json::Value>>,
+        groups: Option<Vec<serde_json::Value>>,
+        users: Option<Vec<serde_json::Value>>,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/group_create";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("name", json!(name));
+        opsert("id", id, &mut map);
+        opsert("title", title, &mut map);
+        opsert("description", description, &mut map);
+        opsert("image_url", image_url, &mut map);
+        opsert("_type", _type, &mut map);
+        opsert("state", state, &mut map);
+        opsert("approval_status", approval_status, &mut map);
+        opsert("extras", extras, &mut map);
+        opsert("packages", packages, &mut map);
+        opsert("groups", groups, &mut map);
+        opsert("users", users, &mut map);
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.organization_create
+    #[builder]
+    pub async fn organization_create(
+        &self,
+        name: String,
+        id: Option<String>,
+        title: Option<String>,
+        description: Option<String>,
+        image_url: Option<String>,
+        state: Option<String>,
+        approval_status: Option<String>,
+        extras: Option<Vec<serde_json::Value>>,
+        packages: Option<Vec<serde_json::Value>>,
+        users: Option<Vec<serde_json::Value>>,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/organization_create";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("name", json!(name));
+        opsert("id", id, &mut map);
+        opsert("title", title, &mut map);
+        opsert("description", description, &mut map);
+        opsert("image_url", image_url, &mut map);
+        opsert("state", state, &mut map);
+        opsert("approval_status", approval_status, &mut map);
+        opsert("extras", extras, &mut map);
+        opsert("packages", packages, &mut map);
+        opsert("users", users, &mut map);
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.user_create
+    #[builder]
+    pub async fn user_create(
+        &self,
+        name: String,
+        email: String,
+        password: String,
+        id: Option<String>,
+        fullname: Option<String>,
+        about: Option<String>,
+        image_url: Option<String>,
+        plugin_extras: Option<serde_json::Value>,
+        with_apitoken: Option<bool>,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/user_create";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("name", json!(name));
+        map.insert("email", json!(email));
+        map.insert("password", json!(password));
+        opsert("id", id, &mut map);
+        opsert("fullname", fullname, &mut map);
+        opsert("about", about, &mut map);
+        opsert("image_url", image_url, &mut map);
+        opsert("plugin_extras", plugin_extras, &mut map);
+        opsert("with_apitoken", with_apitoken, &mut map);
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.user_invite
+    #[builder]
+    pub async fn user_invite(
+        &self,
+        email: String,
+        group_id: String,
+        role: String,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/user_invite";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("email", json!(email));
+        map.insert("group_id", json!(group_id));
+        map.insert("role", json!(role));
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.vocabulary_create
+    #[builder]
+    pub async fn vocabulary_create(
+        &self,
+        name: String,
+        tags: Vec<serde_json::Value>,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/vocabulary_create";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("name", json!(name));
+        map.insert("tags", json!(tags));
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.tag_create
+    #[builder]
+    pub async fn tag_create(
+        &self,
+        name: String,
+        vocabulary_id: String,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/tag_create";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("name", json!(name));
+        map.insert("vocabulary_id", json!(vocabulary_id));
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.follow_user
+    #[builder]
+    pub async fn follow_user(
+        &self,
+        id: String,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/follow_user";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("id", json!(id));
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.follow_dataset
+    #[builder]
+    pub async fn follow_dataset(
+        &self,
+        id: String,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/follow_dataset";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("id", json!(id));
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.group_member_create
+    #[builder]
+    pub async fn group_member_create(
+        &self,
+        id: String,
+        username: String,
+        role: String,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/group_member_create";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("id", json!(id));
+        map.insert("username", json!(username));
+        map.insert("role", json!(role));
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.organization_member_create
+    #[builder]
+    pub async fn organization_member_create(
+        &self,
+        id: String,
+        username: String,
+        role: String,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/organization_member_create";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("id", json!(id));
+        map.insert("username", json!(username));
+        map.insert("role", json!(role));
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.follow_group
+    #[builder]
+    pub async fn follow_group(
+        &self,
+        id: String,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/follow_group";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("id", json!(id));
+        let body = hashmap_to_json(&map)?;
+        Ok(Self::post(&self)
+            .endpoint(endpoint)
+            .body(body)
+            .call()
+            .await?)
+    }
+
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.api_token_create
+    #[builder]
+    pub async fn api_token_create(
+        &self,
+        user: String,
+        name: String,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let endpoint = self.url.clone() + "/api/3/action/api_token_create";
+        let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
+        map.insert("user", json!(user));
+        map.insert("name", json!(name));
         let body = hashmap_to_json(&map)?;
         Ok(Self::post(&self)
             .endpoint(endpoint)
