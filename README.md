@@ -4,7 +4,7 @@ Rust library crate to access CKAN Action API endpoints through Rust builders. Ba
 
 ## Examples
 
-Run `/status_show` endpoint for a CKAN instance and print the output:
+Run `/package_list` endpoint with a limit of 5 results per page and print the output:
 
 ```rust
 use dotenvy::dotenv;
@@ -20,22 +20,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .token(dotenvy::var("CKAN_API_TOKEN")?)
         .build();
 
-    // Send request to /status_show and print output
-    let status_show = ckan.status_show().await?;
-    println!("{status_show:#?}");
+    // Send request to /package_list and print output
+    let result = ckan.package_list()
+        .limit(5) // <-- This is an optional parameter you can remove
+        .call()
+        .await?;
+    println!("{result:#?}");
 
     Ok(())
 }
 ```
 
 > The following examples won't include the boilerplate code.
-
-List packages:
-
-```rust
-let result = ckan.package_list().call().await?;
-println!("{result:#?}");
-```
 
 Create a new package (dataset) with custom fields:
 
@@ -67,6 +63,13 @@ let result = ckan
     .call()
     .await?;
 println!("{result:#?}");
+```
+
+Some endpoints without any parameters may not need a builder such as `/status_show` so there is no need to run `.call()` on `.status_show()`:
+
+```rust
+let status_show = ckan.status_show().await?;
+println!("{status_show:#?}");
 ```
 
 ## Notes
