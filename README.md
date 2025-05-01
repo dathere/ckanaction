@@ -65,7 +65,7 @@ let result = ckan
 println!("{result:#?}");
 ```
 
-Some endpoints without any parameters may not need a builder such as `/status_show` so there is no need to run `.call()` on `.status_show()`:
+Some endpoints without any parameters may not need a builder such as `/status_show` so there is no `.call()` method after `.status_show()`:
 
 ```rust
 let status_show = ckan.status_show().await?;
