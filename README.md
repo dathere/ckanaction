@@ -2,6 +2,10 @@
 
 Rust library crate to access [CKAN](https://ckan.org) Action API endpoints through Rust builders. Based on the CKAN Action API v3. Endpoints are expected to return with an output of type `serde_json::Value`.
 
+```bash
+cargo add ckanaction
+```
+
 ![ckanaction IDE hints demo](https://github.com/user-attachments/assets/515d5742-4a33-43b9-9f3f-4795d18579c0)
 
 ## Examples
