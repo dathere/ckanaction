@@ -2,10 +2,13 @@
 name = "ckanaction"
 version = "0.1.0"
 edition = "2024"
+description = "Rust library crate featuring an API wrapper of the CKAN Action v3 API."
+repository = "https://github.com/dathere/ckanaction"
+keywords = ["ckan"]
+categories = ["api-bindings", "asynchronous"]
 
 [dependencies]
 bon = "3.6.3"
-dotenvy = "0.15.7"
 reqwest = { version = "0.12.15", features = ["json", "multipart", "stream"] }
 serde = "1.0.219"
 serde_json = "1.0.140"

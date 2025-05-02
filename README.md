@@ -1,6 +1,6 @@
 # ckanaction
 
-Rust library crate to access CKAN Action API endpoints through Rust builders. Based on the CKAN Action API v3. Endpoints are expected to return with an output of type `serde_json::Value`.
+Rust library crate to access [CKAN](https://ckan.org) Action API endpoints through Rust builders. Based on the CKAN Action API v3. Endpoints are expected to return with an output of type `serde_json::Value`.
 
 ![ckanaction IDE hints demo](https://github.com/user-attachments/assets/515d5742-4a33-43b9-9f3f-4795d18579c0)
 
@@ -76,5 +76,4 @@ println!("{status_show:#?}");
 
 ## Notes
 
-- Add the `CKAN_API_TOKEN` environment variable to a `.env` file where the program runs to include the token when making requests to the CKAN API.
 - If you use a `maybe_fn()` then if you provide `None` it will be ignored and that parameter will not be added to the JSON body. This library assumes `None` would not be provided as a value (since the cases where it is a value is often the default value that the CKAN API already has set for that parameter).
