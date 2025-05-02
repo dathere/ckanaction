@@ -1,3 +1,9 @@
+//! # ckanaction
+//!
+//! Rust library crate to access [CKAN](https://ckan.org) Action API endpoints through Rust builders. Based on the CKAN Action API v3. Endpoints are expected to return with an output of type `serde_json::Value`.
+//!
+//! Learn more at [github.com/dathere/ckanaction](https://github.com/dathere/ckanaction).
+
 use bon::bon;
 use serde_json::json;
 use std::{collections::HashMap, path::PathBuf};
