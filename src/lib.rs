@@ -35,8 +35,14 @@ impl CKAN {
         }
     }
 
-    async fn get(endpoint: String) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
-        Ok(reqwest::get(endpoint)
+    async fn get(&self, endpoint: String) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        let client = reqwest::Client::new();
+        let mut req_builder = client.get(endpoint);
+        if self.token.is_some() {
+            req_builder = req_builder.header("Authorization", self.token.clone().unwrap());
+        }
+        Ok(req_builder
+            .send()
             .await?
             .json::<serde_json::Value>()
             .await?)
@@ -807,13 +813,13 @@ impl CKAN {
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.status_show
     pub async fn status_show(&self) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
         let endpoint = self.url.clone() + "/api/3/action/status_show";
-        Ok(Self::get(endpoint).await?)
+        Ok(Self::get(&self, endpoint).await?)
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.vocabulary_list
     pub async fn vocabulary_list(&self) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
         let endpoint = self.url.clone() + "/api/3/action/vocabulary_list";
-        Ok(Self::get(endpoint).await?)
+        Ok(Self::get(&self, endpoint).await?)
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.vocabulary_show
@@ -1231,7 +1237,7 @@ impl CKAN {
         &self,
     ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
         let endpoint = self.url.clone() + "/api/3/action/config_option_list";
-        Ok(Self::get(endpoint).await?)
+        Ok(Self::get(&self, endpoint).await?)
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.job_list
@@ -2353,11 +2359,26 @@ impl CKAN {
     #[builder]
     pub async fn config_option_update(
         &self,
-        key: String,
+        custom_fields: Option<serde_json::Value>,
     ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
         let endpoint = self.url.clone() + "/api/3/action/config_option_update";
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
-        map.insert("key", json!(key));
+        let mut custom_map: HashMap<String, serde_json::Value> = HashMap::new();
+        if let Some(custom) = custom_fields {
+            if custom.is_object() {
+                let custom_temp_map = custom.as_object().unwrap();
+                custom_map.extend(
+                    custom_temp_map
+                        .iter()
+                        .map(|item| (item.0.to_owned(), item.1.to_owned())),
+                );
+            }
+        }
+        map.extend(
+            custom_map
+                .iter()
+                .map(|item| (item.0.as_str(), item.1.to_owned())),
+        );
         let body = hashmap_to_json(&map)?;
         Ok(Self::post(&self)
             .endpoint(endpoint)
