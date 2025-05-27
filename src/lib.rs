@@ -20,9 +20,8 @@ fn opsert<'a, T: serde::ser::Serialize>(
 ) {
     if value.is_some() {
         map.insert(name, json!(value));
-        ()
-    } else {
-    };
+        
+    } ;
 }
 
 fn hashmap_to_json(
@@ -95,11 +94,11 @@ impl CKAN {
         opsert("limit", limit, &mut map);
         opsert("offset", offset, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.current_package_list_with_resources
@@ -116,11 +115,11 @@ impl CKAN {
         opsert("offset", offset, &mut map);
         opsert("page", page, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.member_list
@@ -137,11 +136,11 @@ impl CKAN {
         opsert("object_type", object_type, &mut map);
         opsert("capacity", capacity, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.package_collaborator_list
@@ -156,11 +155,11 @@ impl CKAN {
         map.insert("id", json!(id));
         opsert("capacity", capacity, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.package_collaborator_list_for_user
@@ -175,11 +174,11 @@ impl CKAN {
         map.insert("id", json!(id));
         opsert("capacity", capacity, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.group_list
@@ -214,11 +213,11 @@ impl CKAN {
         opsert("include_groups", include_groups, &mut map);
         opsert("include_users", include_users, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.organization_list
@@ -253,11 +252,11 @@ impl CKAN {
         opsert("include_groups", include_groups, &mut map);
         opsert("include_users", include_users, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.group_list_authz
@@ -272,11 +271,11 @@ impl CKAN {
         opsert("available_only", available_only, &mut map);
         opsert("am_member", am_member, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.organization_list_for_user
@@ -293,18 +292,18 @@ impl CKAN {
         opsert("permission", permission, &mut map);
         opsert("include_dataset_count", include_dataset_count, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.license_list
     #[builder]
     pub async fn license_list(&self) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
         let endpoint = self.url.clone() + "/api/3/action/license_list";
-        Ok(Self::post(&self).endpoint(endpoint).call().await?)
+        Self::post(self).endpoint(endpoint).call().await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.tag_list
@@ -321,11 +320,11 @@ impl CKAN {
         opsert("vocabulary_id", vocabulary_id, &mut map);
         opsert("all_fields", all_fields, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.user_list
@@ -346,11 +345,11 @@ impl CKAN {
         opsert("all_fields", all_fields, &mut map);
         opsert("include_site_user", include_site_user, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.package_relationships_list
@@ -367,11 +366,11 @@ impl CKAN {
         map.insert("id2", json!(id2));
         opsert("rel", rel, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.resource_show
@@ -384,11 +383,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.resource_view_show
@@ -401,11 +400,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.resource_view_list
@@ -418,11 +417,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.group_show
@@ -449,11 +448,11 @@ impl CKAN {
         opsert("include_tags", include_tags, &mut map);
         opsert("include_followers", include_followers, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.organization_show
@@ -480,11 +479,11 @@ impl CKAN {
         opsert("include_tags", include_tags, &mut map);
         opsert("include_followers", include_followers, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.group_package_show
@@ -499,11 +498,11 @@ impl CKAN {
         map.insert("id", json!(id));
         opsert("limit", limit, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.tag_show
@@ -520,11 +519,11 @@ impl CKAN {
         opsert("vocabulary_id", vocabulary_id, &mut map);
         opsert("include_datasets", include_datasets, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.user_show
@@ -545,11 +544,11 @@ impl CKAN {
         opsert("include_password_hash", include_password_hash, &mut map);
         opsert("include_plugin_extras", include_plugin_extras, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.package_autocomplete
@@ -564,11 +563,11 @@ impl CKAN {
         map.insert("q", json!(q));
         opsert("limit", limit, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.format_autocomplete
@@ -583,11 +582,11 @@ impl CKAN {
         map.insert("q", json!(q));
         opsert("limit", limit, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.user_autocomplete
@@ -602,11 +601,11 @@ impl CKAN {
         map.insert("q", json!(q));
         opsert("limit", limit, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.group_autocomplete
@@ -621,11 +620,11 @@ impl CKAN {
         map.insert("q", json!(q));
         opsert("limit", limit, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.organization_autocomplete
@@ -640,11 +639,11 @@ impl CKAN {
         map.insert("q", json!(q));
         opsert("limit", limit, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.package_search
@@ -681,11 +680,11 @@ impl CKAN {
         opsert("include_private", include_private, &mut map);
         opsert("use_default_schema", use_default_schema, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.resource_search
@@ -704,11 +703,11 @@ impl CKAN {
         opsert("offset", offset, &mut map);
         opsert("limit", limit, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.tag_search
@@ -727,11 +726,11 @@ impl CKAN {
         opsert("limit", limit, &mut map);
         opsert("offset", offset, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.tag_autocomplete
@@ -750,11 +749,11 @@ impl CKAN {
         opsert("limit", limit, &mut map);
         opsert("offset", offset, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.task_status_show
@@ -773,11 +772,11 @@ impl CKAN {
         opsert("task_type", task_type, &mut map);
         opsert("key", key, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.term_translation_show
@@ -792,16 +791,16 @@ impl CKAN {
         opsert("terms", terms, &mut map);
         opsert("lang_codes", lang_codes, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.get_site_user
     #[builder]
-    pub async fn get_site_user<T: serde::Serialize>(
+    pub async fn get_site_user(
         &self,
         defer_commit: Option<bool>,
     ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
@@ -809,23 +808,23 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         opsert("defer_commit", defer_commit, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.status_show
     pub async fn status_show(&self) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
         let endpoint = self.url.clone() + "/api/3/action/status_show";
-        Ok(Self::get(&self, endpoint).await?)
+        Self::get(self, endpoint).await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.vocabulary_list
     pub async fn vocabulary_list(&self) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
         let endpoint = self.url.clone() + "/api/3/action/vocabulary_list";
-        Ok(Self::get(&self, endpoint).await?)
+        Self::get(self, endpoint).await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.vocabulary_show
@@ -838,11 +837,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.user_follower_count
@@ -855,11 +854,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.dataset_follower_count
@@ -872,11 +871,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.group_follower_count
@@ -889,11 +888,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.organization_follower_count
@@ -906,11 +905,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.user_follower_list
@@ -923,11 +922,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.dataset_follower_list
@@ -940,11 +939,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.group_follower_list
@@ -957,11 +956,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.am_following_user
@@ -974,11 +973,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.am_following_dataset
@@ -991,11 +990,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.am_following_group
@@ -1008,11 +1007,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.followee_count
@@ -1025,11 +1024,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.user_followee_count
@@ -1042,11 +1041,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.dataset_followee_count
@@ -1059,11 +1058,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.group_followee_count
@@ -1076,11 +1075,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.organization_followee_count
@@ -1093,11 +1092,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.followee_list
@@ -1112,11 +1111,11 @@ impl CKAN {
         map.insert("id", json!(id));
         opsert("q", q, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.user_followee_list
@@ -1129,11 +1128,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.dataset_followee_list
@@ -1146,11 +1145,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.group_followee_list
@@ -1163,11 +1162,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.organization_followee_list
@@ -1180,11 +1179,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.member_roles_list
@@ -1197,11 +1196,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         opsert("group_type", group_type, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.help_show
@@ -1214,11 +1213,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("name", json!(name));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.config_option_show
@@ -1231,11 +1230,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("key", json!(key));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.config_option_list
@@ -1243,7 +1242,7 @@ impl CKAN {
         &self,
     ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
         let endpoint = self.url.clone() + "/api/3/action/config_option_list";
-        Ok(Self::get(&self, endpoint).await?)
+        Self::get(self, endpoint).await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.job_list
@@ -1256,11 +1255,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         opsert("queues", queues, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.job_show
@@ -1273,11 +1272,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.api_token_list
@@ -1290,11 +1289,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("user_id", json!(user_id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.package_create
@@ -1352,8 +1351,8 @@ impl CKAN {
         let mut custom_map: HashMap<String, serde_json::Value> = HashMap::new();
         opsert("groups", groups, &mut map);
         opsert("owner_org", owner_org, &mut map);
-        if let Some(custom) = custom_fields {
-            if custom.is_object() {
+        if let Some(custom) = custom_fields
+            && custom.is_object() {
                 let custom_temp_map = custom.as_object().unwrap();
                 custom_map.extend(
                     custom_temp_map
@@ -1361,18 +1360,17 @@ impl CKAN {
                         .map(|item| (item.0.to_owned(), item.1.to_owned())),
                 );
             }
-        }
         map.extend(
             custom_map
                 .iter()
                 .map(|item| (item.0.as_str(), item.1.to_owned())),
         );
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.resource_create
@@ -1413,12 +1411,12 @@ impl CKAN {
         opsert("cache_last_updated", cache_last_updated, &mut map);
 
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .maybe_upload(upload)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.resource_view_create
@@ -1439,11 +1437,11 @@ impl CKAN {
         map.insert("view_type", json!(view_type));
         opsert("config", config, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.create_default_resource_views
@@ -1460,11 +1458,11 @@ impl CKAN {
         opsert("package", package, &mut map);
         opsert("create_datastore_views", create_datastore_views, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.package_create_default_resource_views
@@ -1479,11 +1477,11 @@ impl CKAN {
         map.insert("package", package);
         opsert("create_datastore_views", create_datastore_views, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.package_relationship_create
@@ -1502,11 +1500,11 @@ impl CKAN {
         map.insert("type", json!(_type));
         opsert("comment", comment, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.member_create
@@ -1525,11 +1523,11 @@ impl CKAN {
         map.insert("object_type", json!(object_type));
         map.insert("capacity", json!(capacity));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.package_collaborator_create
@@ -1546,11 +1544,11 @@ impl CKAN {
         map.insert("user_id", json!(user_id));
         map.insert("capacity", json!(capacity));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.group_create
@@ -1585,11 +1583,11 @@ impl CKAN {
         opsert("groups", groups, &mut map);
         opsert("users", users, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.organization_create
@@ -1620,11 +1618,11 @@ impl CKAN {
         opsert("packages", packages, &mut map);
         opsert("users", users, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.user_create
@@ -1653,11 +1651,11 @@ impl CKAN {
         opsert("plugin_extras", plugin_extras, &mut map);
         opsert("with_apitoken", with_apitoken, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.user_invite
@@ -1674,11 +1672,11 @@ impl CKAN {
         map.insert("group_id", json!(group_id));
         map.insert("role", json!(role));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.vocabulary_create
@@ -1693,11 +1691,11 @@ impl CKAN {
         map.insert("name", json!(name));
         map.insert("tags", json!(tags));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.tag_create
@@ -1712,11 +1710,11 @@ impl CKAN {
         map.insert("name", json!(name));
         map.insert("vocabulary_id", json!(vocabulary_id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.follow_user
@@ -1729,11 +1727,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.follow_dataset
@@ -1746,11 +1744,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.group_member_create
@@ -1767,11 +1765,11 @@ impl CKAN {
         map.insert("username", json!(username));
         map.insert("role", json!(role));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.organization_member_create
@@ -1788,11 +1786,11 @@ impl CKAN {
         map.insert("username", json!(username));
         map.insert("role", json!(role));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.follow_group
@@ -1805,11 +1803,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.api_token_create
@@ -1824,11 +1822,11 @@ impl CKAN {
         map.insert("user", json!(user));
         map.insert("name", json!(name));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.resource_update
@@ -1871,12 +1869,12 @@ impl CKAN {
         opsert("cache_last_updated", cache_last_updated, &mut map);
 
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .maybe_upload(upload)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.resource_view_update
@@ -1899,11 +1897,11 @@ impl CKAN {
         map.insert("view_type", json!(view_type));
         opsert("config", config, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.resource_view_reorder
@@ -1918,11 +1916,11 @@ impl CKAN {
         map.insert("id", json!(id));
         map.insert("order", json!(order));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.package_update
@@ -1982,8 +1980,8 @@ impl CKAN {
         let mut custom_map: HashMap<String, serde_json::Value> = HashMap::new();
         opsert("groups", groups, &mut map);
         opsert("owner_org", owner_org, &mut map);
-        if let Some(custom) = custom_fields {
-            if custom.is_object() {
+        if let Some(custom) = custom_fields
+            && custom.is_object() {
                 let custom_temp_map = custom.as_object().unwrap();
                 custom_map.extend(
                     custom_temp_map
@@ -1991,18 +1989,17 @@ impl CKAN {
                         .map(|item| (item.0.to_owned(), item.1.to_owned())),
                 );
             }
-        }
         map.extend(
             custom_map
                 .iter()
                 .map(|item| (item.0.as_str(), item.1.to_owned())),
         );
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.package_revise
@@ -2021,11 +2018,11 @@ impl CKAN {
         map.insert("update", update);
         opsert("include", include, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.package_resource_reorder
@@ -2040,11 +2037,11 @@ impl CKAN {
         map.insert("id", json!(id));
         map.insert("order", json!(order));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.package_relationship_update
@@ -2063,11 +2060,11 @@ impl CKAN {
         map.insert("type", json!(_type));
         opsert("comment", comment, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.group_update
@@ -2102,11 +2099,11 @@ impl CKAN {
         opsert("groups", groups, &mut map);
         opsert("users", users, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.organization_update
@@ -2135,11 +2132,11 @@ impl CKAN {
         opsert("extras", extras, &mut map);
         opsert("users", users, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.user_update
@@ -2168,11 +2165,11 @@ impl CKAN {
         opsert("plugin_extras", plugin_extras, &mut map);
         opsert("with_apitoken", with_apitoken, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.task_status_update
@@ -2201,11 +2198,11 @@ impl CKAN {
         opsert("last_updated", last_updated, &mut map);
         opsert("error", error, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.task_status_update_many
@@ -2218,11 +2215,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("data", json!(data));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.term_translation_update
@@ -2239,11 +2236,11 @@ impl CKAN {
         map.insert("term_translation", json!(term_translation));
         map.insert("lang_code", json!(lang_code));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.term_translation_update_many
@@ -2256,11 +2253,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("data", json!(data));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.vocabulary_update
@@ -2277,11 +2274,11 @@ impl CKAN {
         map.insert("name", json!(name));
         map.insert("tags", json!(tags));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.package_owner_org_update
@@ -2296,11 +2293,11 @@ impl CKAN {
         map.insert("id", json!(id));
         map.insert("organization_id", json!(organization_id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.bulk_update_private
@@ -2315,11 +2312,11 @@ impl CKAN {
         map.insert("datasets", json!(datasets));
         map.insert("org_id", json!(org_id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.bulk_update_public
@@ -2334,11 +2331,11 @@ impl CKAN {
         map.insert("datasets", json!(datasets));
         map.insert("org_id", json!(org_id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.bulk_update_delete
@@ -2353,11 +2350,11 @@ impl CKAN {
         map.insert("datasets", json!(datasets));
         map.insert("org_id", json!(org_id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     // TODO: Verify proper parameters
@@ -2370,8 +2367,8 @@ impl CKAN {
         let endpoint = self.url.clone() + "/api/3/action/config_option_update";
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         let mut custom_map: HashMap<String, serde_json::Value> = HashMap::new();
-        if let Some(options_obj) = options {
-            if options_obj.is_object() {
+        if let Some(options_obj) = options
+            && options_obj.is_object() {
                 let custom_temp_map = options_obj.as_object().unwrap();
                 custom_map.extend(
                     custom_temp_map
@@ -2379,18 +2376,17 @@ impl CKAN {
                         .map(|item| (item.0.to_owned(), item.1.to_owned())),
                 );
             }
-        }
         map.extend(
             custom_map
                 .iter()
                 .map(|item| (item.0.as_str(), item.1.to_owned())),
         );
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.patch.package_patch
@@ -2450,8 +2446,8 @@ impl CKAN {
         let mut custom_map: HashMap<String, serde_json::Value> = HashMap::new();
         opsert("groups", groups, &mut map);
         opsert("owner_org", owner_org, &mut map);
-        if let Some(custom) = custom_fields {
-            if custom.is_object() {
+        if let Some(custom) = custom_fields
+            && custom.is_object() {
                 let custom_temp_map = custom.as_object().unwrap();
                 custom_map.extend(
                     custom_temp_map
@@ -2459,18 +2455,17 @@ impl CKAN {
                         .map(|item| (item.0.to_owned(), item.1.to_owned())),
                 );
             }
-        }
         map.extend(
             custom_map
                 .iter()
                 .map(|item| (item.0.as_str(), item.1.to_owned())),
         );
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.patch.resource_patch
@@ -2513,12 +2508,12 @@ impl CKAN {
         opsert("cache_last_updated", cache_last_updated, &mut map);
 
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .maybe_upload(upload)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.update.group_patch
@@ -2553,11 +2548,11 @@ impl CKAN {
         opsert("groups", groups, &mut map);
         opsert("users", users, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.patch.organization_patch
@@ -2586,11 +2581,11 @@ impl CKAN {
         opsert("extras", extras, &mut map);
         opsert("users", users, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.patch.user_patch
@@ -2619,11 +2614,11 @@ impl CKAN {
         opsert("plugin_extras", plugin_extras, &mut map);
         opsert("with_apitoken", with_apitoken, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.user_delete
@@ -2636,11 +2631,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.package_delete
@@ -2653,11 +2648,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.dataset_purge
@@ -2670,11 +2665,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.resource_delete
@@ -2687,11 +2682,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.resource_view_delete
@@ -2704,11 +2699,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.resource_view_clear
@@ -2721,11 +2716,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         opsert("view_types", view_types, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.package_relationship_delete
@@ -2742,11 +2737,11 @@ impl CKAN {
         map.insert("object", json!(object));
         map.insert("type", json!(_type));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.member_delete
@@ -2763,11 +2758,11 @@ impl CKAN {
         map.insert("object", json!(object));
         map.insert("object_type", json!(object_type));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.package_collaborator_delete
@@ -2782,11 +2777,11 @@ impl CKAN {
         map.insert("id", json!(id));
         map.insert("user_id", json!(user_id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.group_delete
@@ -2799,11 +2794,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.organization_delete
@@ -2816,11 +2811,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.group_purge
@@ -2833,11 +2828,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.organization_purge
@@ -2850,11 +2845,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.task_status_delete
@@ -2867,11 +2862,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.vocabulary_delete
@@ -2884,11 +2879,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.tag_delete
@@ -2903,11 +2898,11 @@ impl CKAN {
         map.insert("id", json!(id));
         map.insert("vocabulary_id", json!(vocabulary_id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.unfollow_user
@@ -2920,11 +2915,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.unfollow_dataset
@@ -2937,11 +2932,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.group_member_delete
@@ -2956,11 +2951,11 @@ impl CKAN {
         map.insert("id", json!(id));
         map.insert("username", json!(username));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.organization_member_delete
@@ -2975,11 +2970,11 @@ impl CKAN {
         map.insert("id", json!(id));
         map.insert("username", json!(username));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.unfollow_group
@@ -2992,11 +2987,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.job_clear
@@ -3009,11 +3004,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         opsert("queues", queues, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.job_cancel
@@ -3026,11 +3021,11 @@ impl CKAN {
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         map.insert("id", json!(id));
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.api_token_revoke
@@ -3045,10 +3040,10 @@ impl CKAN {
         map.insert("token", json!(token));
         opsert("jti", jti, &mut map);
         let body = hashmap_to_json(&map)?;
-        Ok(Self::post(&self)
+        Self::post(self)
             .endpoint(endpoint)
             .body(body)
             .call()
-            .await?)
+            .await
     }
 }
