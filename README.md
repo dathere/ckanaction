@@ -81,3 +81,11 @@ println!("{status_show:#?}");
 ## Notes
 
 - If you use a `maybe_fn()` then if you provide `None` it will be ignored and that parameter will not be added to the JSON body. This library assumes `None` would not be provided as a value (since the cases where it is a value is often the default value that the CKAN API already has set for that parameter).
+
+## Tests
+
+To run the tests in the `tests` directory, first replace the values for `CKAN_API_TOKEN` and `CKAN_URL` then run:
+
+```bash
+cargo test
+```
