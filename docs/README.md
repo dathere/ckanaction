@@ -1,4 +1,4 @@
-# ckan-action docs website (ckanaction.dathere.com)
+# ckanaction docs website (ckanaction.dathere.com)
 
 This directory includes a Next.js project built with [Fumadocs](https://github.com/fuma-nama/fumadocs) for documentation of ckanaction. The documentation can be viewed at [ckanaction.dathere.com](https://ckanaction.dathere.com).
 
