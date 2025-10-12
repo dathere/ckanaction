@@ -1,0 +1,87 @@
+info:
+  title: ckanaction
+security:
+  - apiTokenHeader:
+      description: CKAN API token
+      type: apiKey
+      name: Authorization
+      in: header
+components:
+  securitySchemes:
+    apiTokenHeader:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: CKAN API token
+servers:
+  - url: http://localhost:5000/api/3/action
+  - url: '{protocol}://{domain}/api/3/action'
+    description: Your custom server running the CKAN Actions API (v3).
+    variables:
+      protocol:
+        enum:
+          - https
+          - http
+        default: https
+      domain:
+        default: 'demo.ckan.org'
+paths:
+  '/status_show':
+      get:
+        operationId: /status_show
+        summary: /status_show
+        description: This endpoint shows information about the CKAN instance.
+        x-codeSamples:
+          - lang: rust
+            label: Rust SDK (ckanaction)
+            source: |
+              use dotenvy::dotenv;
+
+              #[tokio::main]
+              async fn main() -> Result<(), Box<dyn std::error::Error>> {
+                  // Load environment variables from .env file
+                  dotenv()?;
+
+                  // Initialize and build CKAN struct
+                  let ckan = ckanaction::CKAN::builder()
+                      .url("http://localhost:5000")
+                      .token(dotenvy::var("CKAN_API_TOKEN")?)
+                      .build();
+
+                  // Send request to /status_show and print output
+                  let result = ckan.status_show().await?;
+                  println!("{result:#?}");
+
+                  Ok(())
+              }
+  '/package_list':
+    get:
+      operationId: /package_list
+      summary: /package_list
+      description: This endpoint lists CKAN resources (limit 10).
+      x-codeSamples:
+        - lang: rust
+          label: Rust SDK (ckanaction)
+          source: |
+            use dotenvy::dotenv;
+
+            #[tokio::main]
+            async fn main() -> Result<(), Box<dyn std::error::Error>> {
+                // Load environment variables from .env file
+                dotenv()?;
+
+                // Initialize and build CKAN struct
+                let ckan = ckanaction::CKAN::builder()
+                    .url("http://localhost:5000")
+                    .token(dotenvy::var("CKAN_API_TOKEN")?)
+                    .build();
+
+                // Send request to /package_list and print output
+                let result = ckan.package_list()
+                    .limit(5) // <-- This is an optional parameter you can remove
+                    .call()
+                    .await?;
+                println!("{result:#?}");
+
+                Ok(())
+            }

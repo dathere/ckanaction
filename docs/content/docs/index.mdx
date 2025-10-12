@@ -1,0 +1,38 @@
+---
+title: ckanaction docs
+---
+
+ckanaction is a Rust library crate that acts as an API wrapper for the CKAN Actions API (v3).
+
+This means that instead of using generic request library crates such as `reqwest`, a developer can use `ckanaction` instead to make API calls to their CKAN instance.
+
+For example the following code can be ran to send an HTTP GET request to the `/package_list` endpoint of a local CKAN instance's API by using the `ckanaction` crate:
+
+```rust
+use dotenvy::dotenv;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Load environment variables from .env file
+    dotenv()?;
+
+    // Initialize and build CKAN struct
+    let ckan = ckanaction::CKAN::builder()
+        .url("http://localhost:5000")
+        .token(dotenvy::var("CKAN_API_TOKEN")?)
+        .build();
+
+    // Send request to /package_list and print output
+    let result = ckan.package_list()
+        .limit(5) // <-- This is an optional parameter you can remove
+        .call()
+        .await?;
+    println!("{result:#?}");
+
+    Ok(())
+}
+```
+
+The source code of ckanaction can be found at [github.com/dathere/ckanaction](https://github.com/ckanaction).
+
+You may also explore this web app to view more code examples for each endpoint and also use an interactive GUI for sending HTTP requests to any local or remote CKAN instance.
