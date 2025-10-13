@@ -33,7 +33,7 @@ paths:
         description: This endpoint shows information about the CKAN instance.
         x-codeSamples:
           - lang: rust
-            label: Rust SDK (ckanaction)
+            label: Rust SDK (ckanaction) example
             source: |
               use dotenvy::dotenv;
 
@@ -61,7 +61,7 @@ paths:
       description: This endpoint lists CKAN resources (limit 10).
       x-codeSamples:
         - lang: rust
-          label: Rust SDK (ckanaction)
+          label: Rust SDK (ckanaction) example
           source: |
             use dotenvy::dotenv;
 
@@ -85,3 +85,92 @@ paths:
 
                 Ok(())
             }
+  '/package_show':
+    get:
+      operationId: /package_show
+      summary: /package_show
+      description: Return the metadata of a dataset and its resources.
+      x-codeSamples:
+        - lang: rust
+          label: Rust SDK (ckanaction) example
+          source: |
+            use dotenvy::dotenv;
+
+            #[tokio::main]
+            async fn main() -> Result<(), Box<dyn std::error::Error>> {
+                // Load environment variables from .env file
+                dotenv()?;
+
+                // Initialize and build CKAN struct
+                let ckan = ckanaction::CKAN::builder()
+                    .url("http://localhost:5000")
+                    .token(dotenvy::var("CKAN_API_TOKEN")?)
+                    .build();
+
+                // Send request to /package_show and print output
+                let result = ckan.package_show()
+                    .id("6b044c6b-e896-4800-a94d-9e5147b25a25".to_string())
+                    .call()
+                    .await?;
+                println!("{result:#?}");
+
+                Ok(())
+            }
+      parameters:
+        - in: query
+          name: id
+          description: The ID or name of the dataset
+          required: true
+          schema:
+            type: string
+            default: ""
+  '/package_search':
+    get:
+      operationId: /package_search
+      summary: /package_search
+      description: Searches for packages satisfying a given search criteria.
+      x-codeSamples:
+        - lang: rust
+          label: Rust SDK (ckanaction) example
+          source: |
+            use dotenvy::dotenv;
+
+            #[tokio::main]
+            async fn main() -> Result<(), Box<dyn std::error::Error>> {
+                // Load environment variables from .env file
+                dotenv()?;
+
+                // Initialize and build CKAN struct
+                let ckan = ckanaction::CKAN::builder()
+                    .url("http://localhost:5000")
+                    .token(dotenvy::var("CKAN_API_TOKEN")?)
+                    .build();
+
+                // Send request to /package_search and print output
+                let result = ckan.package_search()
+                    .q("*:*".to_string())
+                    .call()
+                    .await?;
+                println!("{result:#?}");
+
+                Ok(())
+            }
+      parameters:
+        - in: query
+          name: q
+          description: the solr query
+          schema:
+            type: string
+            default: "*:*"
+        - in: query
+          name: fq
+          description: any filter queries to apply
+          schema:
+            type: string
+            default: "*:*"
+        - in: query
+          name: include_private
+          description: if `True`, private datasets will be included in the results. Only private datasets from the user's organizations will be returned and sysadmins will be returned all private datasets.
+          schema:
+            type: boolean
+            default: false
