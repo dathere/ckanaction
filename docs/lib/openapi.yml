@@ -383,6 +383,12 @@ paths:
         - `q=flood` datasets containing the word *flood*, *floods*, or *flooding*
         - `fq=tags:economy` datasets with the tag *economy*
         - `facet.field=["tags"] facet.limit=10 rows=0` top 10 tags
+
+        <Callout title="Title" type="error">
+        There is an issue for the Body dropdown within this UI where an empty object `{}` is set for the `facet` field.
+        
+        Please either remove this field by clicking "Open JSON editor" in the Body dropdown or set it to `true` (the default value) or `false`.
+        </Callout>
       requestBody:
         required: false
         content:
