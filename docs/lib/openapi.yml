@@ -60,8 +60,7 @@ paths:
       summary: /package_list
       description: This endpoint lists CKAN resources.
       requestBody:
-        description: 'Application object that needs to be created.'
-        required: true
+        required: false
         content:
           application/json:
             schema:
@@ -102,10 +101,29 @@ paths:
                 Ok(())
             }
   '/package_show':
-    get:
+    post:
       operationId: /package_show
       summary: /package_show
       description: Return the metadata of a dataset and its resources.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - id
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the dataset
+                  default: ""
+                use_default_schema:
+                  type: boolean
+                  description: use default package schema instead of a custom schema defined with an IDatasetForm plugin
+                include_plugin_data:
+                  type: boolean
+                  description: Include the internal plugin data object (sysadmin only)
       x-codeSamples:
         - lang: rust
           label: Rust SDK (ckanaction) example
@@ -132,19 +150,24 @@ paths:
 
                 Ok(())
             }
-      parameters:
-        - in: query
-          name: id
-          description: The ID or name of the dataset
-          required: true
-          schema:
-            type: string
-            default: ""
   '/package_search':
-    get:
+    post:
       operationId: /package_search
       summary: /package_search
       description: Searches for packages satisfying a given search criteria.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                q:
+                  type: string
+                  description: the solr query.
+                fq:
+                  type: string
+                  description: "any filter queries to apply. Note: `+site_id:{ckan_site_id}` is added to this string prior to the query being executed."
       x-codeSamples:
         - lang: rust
           label: Rust SDK (ckanaction) example
@@ -171,22 +194,3 @@ paths:
 
                 Ok(())
             }
-      parameters:
-        - in: query
-          name: q
-          description: the solr query
-          schema:
-            type: string
-            default: "*:*"
-        - in: query
-          name: fq
-          description: any filter queries to apply
-          schema:
-            type: string
-            default: "*:*"
-        - in: query
-          name: include_private
-          description: if `True`, private datasets will be included in the results. Only private datasets from the user's organizations will be returned and sysadmins will be returned all private datasets.
-          schema:
-            type: boolean
-            default: false
