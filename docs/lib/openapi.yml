@@ -55,10 +55,26 @@ paths:
                   Ok(())
               }
   '/package_list':
-    get:
+    post:
       operationId: /package_list
       summary: /package_list
-      description: This endpoint lists CKAN resources (limit 10).
+      description: This endpoint lists CKAN resources.
+      requestBody:
+        description: 'Application object that needs to be created.'
+        required: true
+        content:
+          application/json:
+            schema:
+              # required:
+              #   - project_uuid
+              type: object
+              properties:
+                limit:
+                  type: integer
+                  description: if given, the list of datasets will be broken into pages of at most `limit` datasets per page and only one page will be returned at a time
+                offset:
+                  type: integer
+                  description: when limit is given, the offset to start returning packages from
       x-codeSamples:
         - lang: rust
           label: Rust SDK (ckanaction) example
