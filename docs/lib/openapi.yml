@@ -235,7 +235,357 @@ paths:
                 am_member:
                   type: boolean
                   description: "if `True` return only the groups the logged-in user is a member of, otherwise return all groups that the user is authorized to edit (for example, sysadmin users are authorized to edit all groups) (default: `False`)"
-  'status_show':
+  'organization_list_for_user':
+    post:
+      operationId: organization_list_for_user
+      summary: organization_list_for_user
+      description: |
+        Return the organizations that the user has a given permission for.
+        
+        Specifically it returns the list of organizations that the currently authorized user has a given permission (for example: "manage_group") against.
+        
+        By default this returns the list of organizations that the currently authorized user is member of, in any capacity.
+        
+        When a user becomes a member of an organization in CKAN they're given a "capacity" (sometimes called a "role"), for example "member", "editor" or "admin".
+        
+        Each of these roles has certain permissions associated with it. For example the admin role has the "admin" permission (which means they have permission to do anything). The editor role has permissions like "create_dataset", "update_dataset" and "delete_dataset". The member role has the "read" permission.
+        
+        This function returns the list of organizations that the authorized user has a given permission for. For example the list of organizations that the user is an admin of, or the list of organizations that the user can create datasets in. This takes account of when permissions cascade down an organization hierarchy.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the name or id of the user to get the organization list for (defaults to the currently authorized user, logged in or via the API key)
+                permission:
+                  type: string
+                  description: "the permission the user has against the returned organizations, for example `\"read\"` or `\"create_dataset\"` (default: `\"manage_group\"`)"
+                include_dataset_count:
+                  type: boolean
+                  description: "include the package_count in each org (default: `False`)"
+  'license_list':
+    post:
+      operationId: license_list
+      summary: license_list
+      description: |
+        Return the list of licenses available for datasets on the site.
+  'tag_list':
+    post:
+      operationId: tag_list
+      summary: tag_list
+      description: |
+        Return a list of the site's tags.
+
+        By default only free tags (tags that don't belong to a vocabulary) are returned. If the `vocabulary_id` argument is given then only tags belonging to that vocabulary will be returned instead.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: a tag name query to search for, if given only tags whose names contain this string will be returned
+                vocabulary_id:
+                  type: string
+                  # if "give" maybe should be if "given"?
+                  description: the id or name of a vocabulary, if give only tags that belong to this vocabulary will be returned
+                all_fields:
+                  type: boolean
+                  description: "return full tag dictionaries instead of just names (default: `False`)"
+  'user_list':
+    post:
+      operationId: user_list
+      summary: user_list
+      description: |
+        Return a list of the site's user accounts.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                q:
+                  type: string
+                  description: filter the users returned to those whose names contain a string
+                email:
+                  type: string
+                  description: filter the users returned to those whose email match a string (you must be a sysadmin to use this filter)
+                order_by:
+                  type: string
+                  description: "which field to sort the list (default: `'display_name'`)."
+                  enum: ["id", "name", "fullname", "display_name", "created", "about", "sysadmin", "number_created_packages"]
+                all_fields:
+                  type: boolean
+                  description: return full user disctionaries instead of just names
+                include_site_user:
+                  type: boolean
+                  description: "add site_user to the result (default: `False`)"
+  'package_relationships_list':
+    post:
+      operationId: package_relationships_list
+      summary: package_relationships_list
+      description: |
+        Return a datset's relationships.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the first package
+                id2:
+                  type: string
+                  description: the id or name of the second package
+                rel:
+                  type: string
+                  description: "relationship as string, see `package_relationship_create()` for the relationship types"
+  'package_show':
+    post:
+      operationId: package_show
+      summary: package_show
+      description: Return the metadata of a dataset and its resources.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - id
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the dataset
+                use_default_schema:
+                  type: boolean
+                  description: use default package schema instead of a custom schema defined with an IDatasetForm plugin
+                include_plugin_data:
+                  type: boolean
+                  description: Include the internal plugin data object (sysadmin only)
+      x-codeSamples:
+        - lang: rust
+          label: Rust SDK (ckanaction) example
+          source: |
+            use dotenvy::dotenv;
+
+            #[tokio::main]
+            async fn main() -> Result<(), Box<dyn std::error::Error>> {
+                // Load environment variables from .env file
+                dotenv()?;
+
+                // Initialize and build CKAN struct
+                let ckan = ckanaction::CKAN::builder()
+                    .url("http://localhost:5000")
+                    .token(dotenvy::var("CKAN_API_TOKEN")?)
+                    .build();
+
+                // Send request to /package_show and print output
+                let result = ckan.package_show()
+                    .id("6b044c6b-e896-4800-a94d-9e5147b25a25".to_string())
+                    .call()
+                    .await?;
+                println!("{result:#?}");
+
+                Ok(())
+            }
+  'resource_show':
+    post:
+      operationId: resource_show
+      summary: resource_show
+      description: Return the metadata of a resource.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the resource
+  'resource_view_show':
+    post:
+      operationId: resource_view_show
+      summary: resource_view_show
+      description: Return the metadata of a resource_view.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the resource_view
+  resource_view_list:
+    post:
+      operationId: resource_view_list
+      summary: resource_view_list
+      description: Return the list of resource views for a particular resource.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the resource
+  group_show:
+    post:
+      operationId: group_show
+      summary: group_show
+      description: Return the details of a group (only its first 1000 datasets are returned).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the group
+                include_datasets:
+                  type: boolean
+                  description: "include a truncated list of the group's datasets (default: `False`)"
+                include_dataset_count:
+                  type: boolean
+                  description: "include the full package_count (default: `True`)"
+                include_extras:
+                  type: boolean
+                  description: "include the group's extra fields (default: `True`)"
+                include_users:
+                  type: boolean
+                  description: "include the group's users (default: `True` if `ckan.auth.public_user_details` is `True` otherwise `False`)"
+                include_groups:
+                  type: boolean
+                  description: "include the group's sub groups (default `True`)"
+                include_tags:
+                  type: boolean
+                  description: "include the group's tags (default: `True`)"
+                include_followers:
+                  type: boolean
+                  description: "include the group's number of followers (default: `True`)"
+  organization_show:
+    post:
+      operationId: organization_show
+      summary: organization_show
+      # Original docs typo "a" instead of "an"
+      description: Return the details of an organization (only its first 10 datasets are returned).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the organization
+                include_datasets:
+                  type: boolean
+                  description: "include a truncated list of the org's datasets (default: `False`)"
+                include_dataset_count:
+                  type: boolean
+                  description: "include the full package_count (default: `True`)"
+                include_extras:
+                  type: boolean
+                  description: "include the organization's extra fields (default: `True`)"
+                include_users:
+                  type: boolean
+                  description: "include the organization's users (default: `True` if `ckan.auth.public_user_details` is `True` otherwise `False`)"
+                include_groups:
+                  type: boolean
+                  description: "include the organization's sub groups (default `True`)"
+                include_tags:
+                  type: boolean
+                  description: "include the organization's tags (default: `True`)"
+                include_followers:
+                  type: boolean
+                  description: "include the organization's number of followers (default: `True`)"                  
+  group_package_show:
+    post:
+      operationId: group_package_show
+      summary: group_package_show
+      description: Return the datasets (packages) of a group.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the group
+                limit:
+                  type: integer
+                  description: the maximum number of datasets to return
+  tag_show:
+    post:
+      operationId: tag_show
+      summary: tag_show
+      description: Return the details of a tag and all its datasets.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the name or id of the tag
+                vocabulary_id:
+                  type: string
+                  description: the id or name of the tag vocabulary that the tag is in - if it is not specified it will assume it is a free tag
+                include_datasets:
+                  type: boolean
+                  description: "include a list of the tag's datasets (up to a limit of 1000 - for more flexibility, use package_search) (default: `False`)"
+  user_show:
+    post:
+      operationId: user_show
+      summary: user_show
+      description: |
+        Return a user account.
+        
+        Either the `id` should be passed or the user should be logged in.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the user
+                include_datasets:
+                  type: boolean
+                  description: "include a list of datasets the user has created. If it is the same user or a sysadmin requesting, it includes datasets that are draft or private (default: `False`, limit: 50)"
+                include_num_followers:
+                  type: boolean
+                  description: "include the number of followers the user has (default: `False`)"
+                include_password_hash:
+                  type: boolean
+                  description: "include the stored password hash (sysadmin only, default: `False`)"
+                include_plugin_extras:
+                  type: boolean
+                  description: "include the internal plugin extras object (sysadmin only, default: `False`)"
+  status_show:
       get:
         operationId: status_show
         summary: status_show
@@ -309,56 +659,6 @@ paths:
 
                 Ok(())
             }
-  'package_show':
-    post:
-      operationId: package_show
-      summary: package_show
-      description: Return the metadata of a dataset and its resources.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              required:
-                - id
-              type: object
-              properties:
-                id:
-                  type: string
-                  description: the id or name of the dataset
-                  default: ""
-                use_default_schema:
-                  type: boolean
-                  description: use default package schema instead of a custom schema defined with an IDatasetForm plugin
-                include_plugin_data:
-                  type: boolean
-                  description: Include the internal plugin data object (sysadmin only)
-      x-codeSamples:
-        - lang: rust
-          label: Rust SDK (ckanaction) example
-          source: |
-            use dotenvy::dotenv;
-
-            #[tokio::main]
-            async fn main() -> Result<(), Box<dyn std::error::Error>> {
-                // Load environment variables from .env file
-                dotenv()?;
-
-                // Initialize and build CKAN struct
-                let ckan = ckanaction::CKAN::builder()
-                    .url("http://localhost:5000")
-                    .token(dotenvy::var("CKAN_API_TOKEN")?)
-                    .build();
-
-                // Send request to /package_show and print output
-                let result = ckan.package_show()
-                    .id("6b044c6b-e896-4800-a94d-9e5147b25a25".to_string())
-                    .call()
-                    .await?;
-                println!("{result:#?}");
-
-                Ok(())
-            }
   'package_search':
     post:
       operationId: package_search
@@ -374,7 +674,7 @@ paths:
 
         This action accepts a subset of Solr's search query parameters.
 
-        The following advanced Solr parameters are supported as well. Note that some of these are only available on particular Solr versions. See Solr’s dismax and edismax documentation for further details on them:
+        The following advanced Solr parameters are supported as well. Note that some of these are only available on particular Solr versions. See Solr's dismax and edismax documentation for further details on them:
 
         `qf`, `wt`, `bf`, `boost`, `tie`, `defType`, `mm`
 
