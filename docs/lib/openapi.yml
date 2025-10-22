@@ -26,10 +26,99 @@ servers:
       domain:
         default: 'demo.ckan.org'
 paths:
-  '/status_show':
+  'current_package_list_with_resources':
+    post:
+      operationId: current_package_list_with_resources
+      summary: current_package_list_with_resources
+      description: |
+        Return a list of the site's datasets (packages) and their resources.
+        
+        The list is sorted most-recently-modified first.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                limit:
+                  type: integer
+                  description: "if given, the list of datasets will be broken into pages of at most `limit` datasets per page and only one page will be returned at a time"
+                offset:
+                  type: integer
+                  description: "when `limit` is given, the offset to start returning packages from"
+  'member_list':
+    post:
+      operationId: member_list
+      summary: member_list
+      description: |
+        Return the members of a group.
+
+        The user must have permission to "get" the group.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the group
+                object_type:
+                  type: string
+                  description: "restrict the members returned to those of a given type, e.g. `'user'` or `'package'` (default: `None`)"
+                capacity:
+                  type: string
+                  description: "restrict the members returned to those with a given capacity, e.g. `'member'`, `'editor'`, `'admin'`, `'public'`, `'private'` (optional, default: `None`)"
+  'package_collaborator_list':
+    post:
+      operationId: package_collaborator_list
+      summary: package_collaborator_list
+      description: |
+        Return the list of all collaborators for a given dataset (package).
+
+        Currently you must be an Admin on the dataset owner organization to manage collaborators.
+
+        Note: This action requires the collaborators feature to be enabled with the [`ckan.auth.allow_dataset_collaborators`](https://docs.ckan.org/en/2.11/maintaining/configuration.html#ckan-auth-allow-dataset-collaborators) configuration option.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the dataset
+                capacity:
+                  type: string
+                  description: if provided, only the users with this capacity are returned
+  'package_collaborator_list_for_user':
+    post:
+      operationId: package_collaborator_list_for_user
+      summary: package_collaborator_list_for_user
+      description: |
+        Return the list of all datasets the user is a collaborator in.
+
+        Note: This action requires the collaborators feature to be enabled with the [`ckan.auth.allow_dataset_collaborators`](https://docs.ckan.org/en/2.11/maintaining/configuration.html#ckan-auth-allow-dataset-collaborators) configuration option.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the user
+                capacity:
+                  type: string
+                  description: if provided, only datasets where the user has this capacity are returned
+  'status_show':
       get:
-        operationId: /status_show
-        summary: /status_show
+        operationId: status_show
+        summary: status_show
         description: This endpoint shows information about the CKAN instance.
         x-codeSamples:
           - lang: rust
@@ -54,10 +143,10 @@ paths:
 
                   Ok(())
               }
-  '/package_list':
+  'package_list':
     post:
-      operationId: /package_list
-      summary: /package_list
+      operationId: package_list
+      summary: package_list
       description: This endpoint lists CKAN resources.
       requestBody:
         required: false
@@ -100,10 +189,10 @@ paths:
 
                 Ok(())
             }
-  '/package_show':
+  'package_show':
     post:
-      operationId: /package_show
-      summary: /package_show
+      operationId: package_show
+      summary: package_show
       description: Return the metadata of a dataset and its resources.
       requestBody:
         required: true
@@ -150,11 +239,30 @@ paths:
 
                 Ok(())
             }
-  '/package_search':
+  'package_search':
     post:
-      operationId: /package_search
-      summary: /package_search
-      description: Searches for packages satisfying a given search criteria.
+      operationId: package_search
+      summary: package_search
+      description: |
+        Searches for packages satisfying a given search criteria.
+
+        This action accepts Solr search query parameters (details below), and returns a dictionary of results, including dictized datasets that match the search criteria, a search count, and also facet information.
+
+        Solr Parameters:
+
+        For more in depth treatment of each parameter, please read the [Solr Documentation](https://solr.apache.org/guide/6_6/common-query-parameters.html).
+
+        This action accepts a subset of Solr's search query parameters.
+
+        The following advanced Solr parameters are supported as well. Note that some of these are only available on particular Solr versions. See Solr’s dismax and edismax documentation for further details on them:
+
+        `qf`, `wt`, `bf`, `boost`, `tie`, `defType`, `mm`
+
+        Examples:
+
+        - `q=flood` datasets containing the word *flood*, *floods*, or *flooding*
+        - `fq=tags:economy` datasets with the tag *economy*
+        - `facet.field=["tags"] facet.limit=10 rows=0` top 10 tags
       requestBody:
         required: false
         content:
@@ -168,6 +276,46 @@ paths:
                 fq:
                   type: string
                   description: "any filter queries to apply. Note: `+site_id:{ckan_site_id}` is added to this string prior to the query being executed."
+                fq_list:
+                  type: array
+                  items:
+                    type: string
+                  description: additional filter queries to apply.
+                sort:
+                  type: string
+                  description: "sorting of the search results. Default: 'score desc, metadata_modified desc'. As per the Solr documentation, this is a comma-separated string of field names and sort-orderings."
+                rows:
+                  type: integer
+                  description: "the maximum number of matching rows (datasets) to return. (default: 10, upper limit: 1000 unless set in site's configuration `ckan.search.rows_max`)"
+                start:
+                  type: integer
+                  description: the offset in the complete result for where the set of returned datasets should begin.
+                facet:
+                  type: boolean
+                  description: "whether to enable faceted results. Default: `True`"
+                facet.mincount:
+                  type: integer
+                  description: the minimum counts for facet fields should be included in the results.
+                facet.limit:
+                  type: integer
+                  description: the maximum number of values the facet fields return. A negative value means unlimited. This can be set instance-wide with the [search.facets.limit](https://docs.ckan.org/en/2.11/maintaining/configuration.html#search-facets-limit) config option. Default is 50.
+                facet.field:
+                  type: array
+                  items:
+                    type: string
+                  description: the fields to facet upon. Default empty. If empty, then the returned facet information is empty.
+                include_drafts:
+                  type: boolean
+                  description: "if `True`, draft datasets will be included in the results. A user will only be returned their own draft datasets, and a sysadmin will be returned all draft datasets. Optional, the default is `False`."
+                include_deleted:
+                  type: boolean
+                  description: "if `True`, deleted datasets will be included in the results (site configuration `ckan.search.remove_deleted_packages` must be set to `False`). Optional, the default is `False`."
+                include_private:
+                  type: boolean
+                  description: "if `True`, private datasets will be included in the results. Only private datasets from the user’s organizations will be returned and sysadmins will be returned all private datasets. Optional, the default is `False`."
+                use_default_schema:
+                  type: boolean
+                  description: "use default package schema instead of a custom schema defined with an IDatasetForm plugin (default: `False`)"
       x-codeSamples:
         - lang: rust
           label: Rust SDK (ckanaction) example
