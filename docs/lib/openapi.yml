@@ -115,6 +115,126 @@ paths:
                 capacity:
                   type: string
                   description: if provided, only datasets where the user has this capacity are returned
+  'group_list':
+    post:
+      operationId: group_list
+      summary: group_list
+      description: |
+        Return a list of the names of the site's groups.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: "the type of group to list (default: `'group'`), see docs for `IGroupForm`"
+                sort:
+                  type: string
+                  description: "sorting of the search results. Default: \"title asc\" string of field name and sort-order. The allowed fields are 'name', 'package_count' and 'title'"
+                limit:
+                  type: integer
+                  description: "the maximum number of groups returned. Default: `1000` when `all_fields=false` unless set in site's configuration `ckan.group_and_organization_list_max`. Default: 25 when `all_fields=true` unless set in site's configuration `ckan.group_and_organization_list_all_fields_max`"
+                offset:
+                  type: integer
+                  description: "when `limit` is given, the offset to start returning groups from"
+                groups:
+                  type: array
+                  items:
+                    type: string
+                  description: a list of names of the groups to return, if given only groups whose names are in this list will be returned
+                all_fields:
+                  type: boolean
+                  description: "return group dictionaries instead of just names. Only core fields are returned - get some more using the include_* options. Returning a list of packages is too expensive, so the *packages* property for each group is deprecated, but there is a count of the packages in the *package_count* property. (default: `False`)"
+                include_dataset_count:
+                  type: boolean
+                  # If `all_fields` is true?
+                  description: "if `all_fields`, include the full package_count (default: `True`)"
+                include_extras:
+                  type: boolean
+                  description: "if `all_fields`, include the group extra fields (default: `False`)"
+                include_tags:
+                  type: boolean
+                  description: "if `all_fields`, include the group tags"
+                include_groups:
+                  type: boolean
+                  description: "if `all_fields`, include the groups the groups are in"
+                include_users:
+                  type: boolean
+                  description: "if `all_fields`, include the group users"
+  'organization_list':
+    post:
+      operationId: organization_list
+      summary: organization_list
+      description: |
+        Return a list of the names of the site's organizations.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: "the type of organization to list (default: `'group'`), see docs for `IGroupForm`"
+                sort:
+                  type: string
+                  description: "sorting of the search results. Default: \"title asc\" string of field name and sort-order. The allowed fields are 'name', 'package_count' and 'title'"
+                limit:
+                  type: integer
+                  description: "the maximum number of organizations returned. Default: `1000` when `all_fields=false` unless set in site's configuration `ckan.group_and_organization_list_max`. Default: 25 when `all_fields=true` unless set in site's configuration `ckan.group_and_organization_list_all_fields_max`"
+                offset:
+                  type: integer
+                  description: "when `limit` is given, the offset to start returning organizations from"
+                organizations:
+                  type: array
+                  items:
+                    type: string
+                  # Original docs typo seems like they say groups instead of organizations
+                  description: a list of names of the organizations to return, if given only organizations whose names are in this list will be returned
+                all_fields:
+                  type: boolean
+                  # Original docs typo seems like they say group instead of organization
+                  description: "return organization dictionaries instead of just names. Only core fields are returned - get some more using the include_* options. Returning a list of packages is too expensive, so the *packages* property for each group is deprecated, but there is a count of the packages in the *package_count* property. (default: `False`)"
+                include_dataset_count:
+                  type: boolean
+                  # If `all_fields` is true?
+                  description: "if `all_fields`, include the full package_count (default: `True`)"
+                include_extras:
+                  type: boolean
+                  description: "if `all_fields`, include the organization extra fields (default: `False`)"
+                include_tags:
+                  type: boolean
+                  description: "if `all_fields`, include the organization tags (default: `False`)"
+                include_groups:
+                  type: boolean
+                  # Modified to organizations instead of groups?
+                  description: "if `all_fields`, include the organizations the organizations are in"
+                include_users:
+                  type: boolean
+                  description: "if `all_fields`, include the organization users"
+  'group_list_authz':
+    post:
+      operationId: group_list_authz
+      summary: group_list_authz
+      description: |
+        Return the list of groups that the user is authorized to edit.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                available_only:
+                  type: boolean
+                  description: "remove the existing groups in the package (default: `False`)"
+                am_member:
+                  type: boolean
+                  description: "if `True` return only the groups the logged-in user is a member of, otherwise return all groups that the user is authorized to edit (for example, sysadmin users are authorized to edit all groups) (default: `False`)"
   'status_show':
       get:
         operationId: status_show
