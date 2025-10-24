@@ -585,81 +585,105 @@ paths:
                 include_plugin_extras:
                   type: boolean
                   description: "include the internal plugin extras object (sysadmin only, default: `False`)"
-  status_show:
-      get:
-        operationId: status_show
-        summary: status_show
-        description: This endpoint shows information about the CKAN instance.
-        x-codeSamples:
-          - lang: rust
-            label: Rust SDK (ckanaction) example
-            source: |
-              use dotenvy::dotenv;
-
-              #[tokio::main]
-              async fn main() -> Result<(), Box<dyn std::error::Error>> {
-                  // Load environment variables from .env file
-                  dotenv()?;
-
-                  // Initialize and build CKAN struct
-                  let ckan = ckanaction::CKAN::builder()
-                      .url("http://localhost:5000")
-                      .token(dotenvy::var("CKAN_API_TOKEN")?)
-                      .build();
-
-                  // Send request to /status_show and print output
-                  let result = ckan.status_show().await?;
-                  println!("{result:#?}");
-
-                  Ok(())
-              }
-  'package_list':
+  package_autocomplete:
     post:
-      operationId: package_list
-      summary: package_list
-      description: This endpoint lists CKAN resources.
+      operationId: package_autocomplete
+      summary: package_autocomplete
+      description: |
+        Return a list of datasets (packages) that match a string.
+
+        Datasets with names or titles that contain the query string will be returned.
       requestBody:
         required: false
         content:
           application/json:
             schema:
-              # required:
-              #   - project_uuid
               type: object
               properties:
+                q:
+                  type: string
+                  description: the string to search for
                 limit:
                   type: integer
-                  description: if given, the list of datasets will be broken into pages of at most `limit` datasets per page and only one page will be returned at a time
-                offset:
+                  # Original docs typo? Should this be max number of datasets?
+                  description: "the maximum number of datasets to return (default: `10`)"
+  format_autocomplete:
+    post:
+      operationId: format_autocomplete
+      summary: format_autocomplete
+      description: |
+        Return a list of resource formats whose names contain a string.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                q:
+                  type: string
+                  description: the string to search for
+                limit:
                   type: integer
-                  description: when limit is given, the offset to start returning packages from
-      x-codeSamples:
-        - lang: rust
-          label: Rust SDK (ckanaction) example
-          source: |
-            use dotenvy::dotenv;
-
-            #[tokio::main]
-            async fn main() -> Result<(), Box<dyn std::error::Error>> {
-                // Load environment variables from .env file
-                dotenv()?;
-
-                // Initialize and build CKAN struct
-                let ckan = ckanaction::CKAN::builder()
-                    .url("http://localhost:5000")
-                    .token(dotenvy::var("CKAN_API_TOKEN")?)
-                    .build();
-
-                // Send request to /package_list and print output
-                let result = ckan.package_list()
-                    .limit(5) // <-- This is an optional parameter you can remove
-                    .call()
-                    .await?;
-                println!("{result:#?}");
-
-                Ok(())
-            }
-  'package_search':
+                  description: "the maximum number of resource formats to return (default: `5`)"
+  user_autocomplete:
+    post:
+      operationId: user_autocomplete
+      summary: user_autocomplete
+      description: |
+        Return a list of user names that contain a string.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                q:
+                  type: string
+                  description: the string to search for
+                limit:
+                  type: integer
+                  description: "the maximum number of user names to return (default: `20`)"
+  group_autocomplete:
+    post:
+      operationId: group_autocomplete
+      summary: group_autocomplete
+      description: |
+        Return a list of group names that contain a string.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                q:
+                  type: string
+                  description: the string to search for
+                limit:
+                  type: integer
+                  description: "the maximum number of groups to return (default: `20`)"
+  organization_autocomplete:
+    post:
+      operationId: organization_autocomplete
+      summary: organization_autocomplete
+      description: |
+        Return a list of organization names that contain a string.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                q:
+                  type: string
+                  description: the string to search for
+                limit:
+                  type: integer
+                  description: "the maximum number of organizations to return (default: `20`)"
+  package_search:
     post:
       operationId: package_search
       summary: package_search
@@ -762,6 +786,139 @@ paths:
                 // Send request to /package_search and print output
                 let result = ckan.package_search()
                     .q("*:*".to_string())
+                    .call()
+                    .await?;
+                println!("{result:#?}");
+
+                Ok(())
+            }
+  resource_search:
+    post:
+      operationId: resource_search
+      summary: resource_search
+      description: |
+        Searches for resources in public Datasets satisfying the search criteria.
+
+        It returns a dictionary with 2 fields: `count` and `results`. The `count` field contains the total number of Resources found without the limit or query parameters having an effect. The `results` field is a list of dictized Resource objects.
+
+        The 'query' parameter is a required field. It is a string of the form `{field}:{term}` or a list of strings, each of the same form. Within each string, `{field}` is a field or extra field on the Resource domain object.
+
+        If `{field}` is `"hash"`, then an attempt is made to match the `{term}` as a *prefix* of the `Resource.hash` field.
+
+        If `{field}` is an extra field, then an attempt is made to match against the extra fields stored against the Resource.
+
+        Note: The search is limited to search against extra fields declared in the config setting `ckan.extra_resource_fields`.
+
+        Note: Due to a Resource's extra fields being stored as a json blob, the match is made against the json string representation. As such, false positives may occur:
+
+        If the search criteria is:
+
+        ```
+        query = "field1:term1"
+        ```
+
+        Then a json blob with the string representation of:
+
+        ```json
+        {"field1": "foo", "field2": "term1"}
+        ```
+
+        will match the search criteria! This is a known short-coming of this approach.
+
+        All matches are made ignoring case; and apart from the `"hash"` field, a term matches if it is a substring of the field’s value.
+
+        Finally, when specifying more than one search criteria, the criteria are AND-ed together.
+
+        The `order` parameter is used to control the ordering of the results. Currently only ordering one field is available, and in ascending order only.
+
+        The context may contain a flag, *search_query*, which if True will make this action behave as if being used by the internal search api. ie - the results will not be dictized, and SearchErrors are thrown for bad search queries (rather than ValidationErrors).
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: the search criteria
+                order_by:
+                  type: string
+                  description: a field on the Resource model that orders the results
+                offset:
+                  type: integer
+                  description: apply an offset to the query
+                limit:
+                  type: integer
+                  description: apply a limit to the query
+  status_show:
+      get:
+        operationId: status_show
+        summary: status_show
+        description: This endpoint shows information about the CKAN instance.
+        x-codeSamples:
+          - lang: rust
+            label: Rust SDK (ckanaction) example
+            source: |
+              use dotenvy::dotenv;
+
+              #[tokio::main]
+              async fn main() -> Result<(), Box<dyn std::error::Error>> {
+                  // Load environment variables from .env file
+                  dotenv()?;
+
+                  // Initialize and build CKAN struct
+                  let ckan = ckanaction::CKAN::builder()
+                      .url("http://localhost:5000")
+                      .token(dotenvy::var("CKAN_API_TOKEN")?)
+                      .build();
+
+                  // Send request to /status_show and print output
+                  let result = ckan.status_show().await?;
+                  println!("{result:#?}");
+
+                  Ok(())
+              }
+  'package_list':
+    post:
+      operationId: package_list
+      summary: package_list
+      description: This endpoint lists CKAN resources.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              # required:
+              #   - project_uuid
+              type: object
+              properties:
+                limit:
+                  type: integer
+                  description: if given, the list of datasets will be broken into pages of at most `limit` datasets per page and only one page will be returned at a time
+                offset:
+                  type: integer
+                  description: when limit is given, the offset to start returning packages from
+      x-codeSamples:
+        - lang: rust
+          label: Rust SDK (ckanaction) example
+          source: |
+            use dotenvy::dotenv;
+
+            #[tokio::main]
+            async fn main() -> Result<(), Box<dyn std::error::Error>> {
+                // Load environment variables from .env file
+                dotenv()?;
+
+                // Initialize and build CKAN struct
+                let ckan = ckanaction::CKAN::builder()
+                    .url("http://localhost:5000")
+                    .token(dotenvy::var("CKAN_API_TOKEN")?)
+                    .build();
+
+                // Send request to /package_list and print output
+                let result = ckan.package_list()
+                    .limit(5) // <-- This is an optional parameter you can remove
                     .call()
                     .await?;
                 println!("{result:#?}");
