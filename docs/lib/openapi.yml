@@ -26,6 +26,50 @@ servers:
       domain:
         default: 'demo.ckan.org'
 paths:
+  package_list:
+    post:
+      operationId: package_list
+      summary: package_list
+      description: This endpoint lists CKAN resources.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                limit:
+                  type: integer
+                  description: if given, the list of datasets will be broken into pages of at most `limit` datasets per page and only one page will be returned at a time
+                offset:
+                  type: integer
+                  description: when limit is given, the offset to start returning packages from
+      x-codeSamples:
+        - lang: rust
+          label: Rust SDK (ckanaction) example
+          source: |
+            use dotenvy::dotenv;
+
+            #[tokio::main]
+            async fn main() -> Result<(), Box<dyn std::error::Error>> {
+                // Load environment variables from .env file
+                dotenv()?;
+
+                // Initialize and build CKAN struct
+                let ckan = ckanaction::CKAN::builder()
+                    .url("http://localhost:5000")
+                    .token(dotenvy::var("CKAN_API_TOKEN")?)
+                    .build();
+
+                // Send request to /package_list and print output
+                let result = ckan.package_list()
+                    .limit(5) // <-- This is an optional parameter you can remove
+                    .call()
+                    .await?;
+                println!("{result:#?}");
+
+                Ok(())
+            }
   'current_package_list_with_resources':
     post:
       operationId: current_package_list_with_resources
@@ -851,6 +895,126 @@ paths:
                 limit:
                   type: integer
                   description: apply a limit to the query
+  tag_search:
+    post:
+      operationId: tag_search
+      summary: tag_search
+      description: |
+        Return a list of tags whose names contain a given string.
+
+        By default only free tags (tags that don't belong to any vocabulary) are searched. If the `vocabulary_id` argument is given then only tags belonging to that vocabulary will be searched instead.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: the string(s) to search for
+                vocabulary_id:
+                  type: string
+                  description: the id or name of the tag vocabulary to search in
+                limit:
+                  type: integer
+                  description: the maximum number of tags to return
+                offset:
+                  type: integer
+                  description: when `limit` is given, the offset to start returning tags from
+  tag_autocomplete:
+    post:
+      operationId: tag_autocomplete
+      summary: tag_autocomplete
+      description: |
+        Return a list of tag names that contain a given string.
+
+        By default only free tags (tags that don't belong to any vocabulary) are searched. If the `vocabulary_id` argument is given then only tags belonging to that vocabulary will be searched instead.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: the string to search for
+                vocabulary_id:
+                  type: string
+                  description: the id or name of the tag vocabulary to search in
+                limit:
+                  type: integer
+                  description: the maximum number of tags to return
+                offset:
+                  type: integer
+                  description: when `limit` is given, the offset to start returning tags from
+  task_status_show:
+    post:
+      operationId: task_status_show
+      summary: task_status_show
+      description: |
+        Return a task status.
+
+        Either the `id` parameter or the `entity_id`, `task_type` *and* `key` parameters must be given.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the task status
+                entity_id:
+                  type: string
+                  description: the entity_id of the task status
+                task_type:
+                  type: string
+                  description: the task_type of the task status
+                key:
+                  type: string
+                  description: the key of the task status
+  term_translation_show:
+    post:
+      operationId: term_translation_show
+      summary: term_translation_show
+      description: |
+        Return the translations for the given term(s) and language(s).
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                terms:
+                  type: array
+                  items:
+                    type: string
+                  description: the terms to search for translations of, e.g. `Russian`, `nonfiction novel`
+                lang_codes:
+                  type: array
+                  items:
+                    type: string
+                  description: the language codes of the languages to search for translations into, e.g. `'en'`, `'de'` (default is to search for translations into any language)
+  get_site_user:
+    post:
+      operationId: get_site_user
+      summary: get_site_user
+      description: |
+        Return the CKAN site user.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                defer_commit:
+                  type: boolean
+                  description: "by default (or if set to `False`) `get_site_user` will commit and clean up the current transaction. If set to `True`, caller is responsible for commiting transaction after `get_site_user` is called. Leaving open connections can cause CLI commands to hang! (default: `False`)"
   status_show:
       get:
         operationId: status_show
@@ -879,49 +1043,410 @@ paths:
 
                   Ok(())
               }
-  'package_list':
+  vocabulary_list:
     post:
-      operationId: package_list
-      summary: package_list
-      description: This endpoint lists CKAN resources.
+      operationId: vocabulary_list
+      summary: vocabulary_list
+      description: |
+        Return a list of all the site's tag vocabularies.
+  vocabulary_show:
+    post:
+      operationId: vocabulary_show
+      summary: vocabulary_show
+      description: |
+        Return a single tag vocabulary.
       requestBody:
         required: false
         content:
           application/json:
             schema:
-              # required:
-              #   - project_uuid
               type: object
               properties:
-                limit:
-                  type: integer
-                  description: if given, the list of datasets will be broken into pages of at most `limit` datasets per page and only one page will be returned at a time
-                offset:
-                  type: integer
-                  description: when limit is given, the offset to start returning packages from
-      x-codeSamples:
-        - lang: rust
-          label: Rust SDK (ckanaction) example
-          source: |
-            use dotenvy::dotenv;
+                id:
+                  type: string
+                  description: the id or name of the vocabulary
+  user_follower_count:
+    post:
+      operationId: user_follower_count
+      summary: user_follower_count
+      description: |
+        Returun the number of followers of a user.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the user
+  dataset_follower_count:
+    post:
+      operationId: dataset_follower_count
+      summary: dataset_follower_count
+      description: |
+        Returun the number of followers of a dataset.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the dataset
+  organization_follower_count:
+    post:
+      operationId: organization_follower_count
+      summary: organization_follower_count
+      description: |
+        Returun the number of followers of an organization.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the organization
+  user_follower_list:
+    post:
+      operationId: user_follower_list
+      summary: user_follower_list
+      description: |
+        Return the list of users that are following the given user.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the user
+  dataset_follower_list:
+    post:
+      operationId: dataset_follower_list
+      summary: dataset_follower_list
+      description: |
+        Return the list of users that are following the given dataset.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the dataset
+  group_follower_list:
+    post:
+      operationId: group_follower_list
+      summary: group_follower_list
+      description: |
+        Return the list of users that are following the given group.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the group
+  organization_follower_list:
+    post:
+      operationId: organization_follower_list
+      summary: organization_follower_list
+      description: |
+        Return the list of users that are following the given organization.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the organization
+  am_following_user:
+    post:
+      operationId: am_following_user
+      summary: am_following_user
+      description: |
+        Return `True` if you're following the given user, `False` if not.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the user
+  am_following_dataset:
+    post:
+      operationId: am_following_dataset
+      summary: am_following_dataset
+      description: |
+        Return `True` if you're following the given dataset, `False` if not.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the dataset
+  am_following_group:
+    post:
+      operationId: am_following_group
+      summary: am_following_group
+      description: |
+        Return `True` if you're following the given group, `False` if not.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the group
+  followee_count:
+    post:
+      operationId: followee_count
+      summary: followee_count
+      description: |
+        Return the number of objects that are followed by the given user.
 
-            #[tokio::main]
-            async fn main() -> Result<(), Box<dyn std::error::Error>> {
-                // Load environment variables from .env file
-                dotenv()?;
+        Counts all objects, of any type, that the given user is following (e.g. followed users, followed datasets, followed groups).
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the user
+  user_followee_count:
+    post:
+      operationId: user_followee_count
+      summary: user_followee_count
+      description: |
+        Return the number of users that are followed by the given user.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the user
+  dataset_followee_count:
+    post:
+      operationId: dataset_followee_count
+      summary: dataset_followee_count
+      description: |
+        Return the number of datasets that are followed by the given user.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the user
+  group_followee_count:
+    post:
+      operationId: group_followee_count
+      summary: group_followee_count
+      description: |
+        Return the number of groups that are followed by the given user.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the user
+  organization_followee_count:
+    post:
+      operationId: organization_followee_count
+      summary: organization_followee_count
+      description: |
+        Return the number of organizations that are followed by the given user.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the user
+  followee_list:
+    post:
+      operationId: followee_list
+      summary: followee_list
+      description: |
+        Return the list of objects that are followed by the given user.
 
-                // Initialize and build CKAN struct
-                let ckan = ckanaction::CKAN::builder()
-                    .url("http://localhost:5000")
-                    .token(dotenvy::var("CKAN_API_TOKEN")?)
-                    .build();
+        Returns all objects, of any type, that the given user is following (e.g. followed users, followed datasets, followed groups).
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the user
+                q:
+                  type: string
+                  description: a query string to limit results by, only objects whose display name begins with the given string (case-insensitive) wil be returned
+  organization_followee_list:
+    post:
+      operationId: organization_followee_list
+      summary: organization_followee_list
+      description: |
+        Return the list of organizations that are followed by the given user.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the user
+  member_roles_list:
+    post:
+      operationId: member_roles_list
+      summary: member_roles_list
+      description: |
+        Return the possible roles for members of groups and organizations.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                group_type:
+                  type: string
+                  description: "the group type, either `\"group\"` or `\"organization\"` (default: `\"organization\"`)"
+  help_show:
+    post:
+      operationId: help_show
+      summary: help_show
+      description: |
+        Return the help string for a particular API action.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Action function name (e.g. `user_create`, `package_search`)
+  config_option_show:
+    post:
+      operationId: config_option_show
+      summary: config_option_show
+      description: |
+        Show the current value of a particular configuration option.
 
-                // Send request to /package_list and print output
-                let result = ckan.package_list()
-                    .limit(5) // <-- This is an optional parameter you can remove
-                    .call()
-                    .await?;
-                println!("{result:#?}");
-
-                Ok(())
-            }
+        Only returns runtime-editable config options (the ones returned by `config_option_list()`), which can be updated with the `config_option_update()` action.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: string
+                  description: The configuration option key
+  config_option_list:
+    post:
+      operationId: config_option_list
+      summary: config_option_list
+      description: |
+        Return a list of runtime-editable config option keys that can be updated with `config_option_update()`.
+  job_list:
+    post:
+      operationId: job_list
+      summary: job_list
+      description: |
+        List enqueued background jobs.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                queues:
+                  type: array
+                  items:
+                    type: string
+                  description: Queues to list jobs from. If not given then the jobs from all queues are listed.
+  job_show:
+    post:
+      operationId: job_show
+      summary: job_show
+      description: |
+        Show details for a background job.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: The ID of the background job.
+  api_token_list:
+    post:
+      operationId: api_token_list
+      summary: api_token_list
+      description: |
+        Return list of all available API tokens for the current user.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                  description: The user ID or name
