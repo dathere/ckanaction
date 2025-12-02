@@ -1897,3 +1897,318 @@ paths:
                   items:
                     type: object
                     additionalProperties: true
+  organization_create:
+    post:
+      operationId: organization_create
+      summary: organization_create
+      description: |
+        Create a new organization.
+
+        You must be authorized to create organizations.
+
+        Plugins may change the parameters of this function depending on the value of the `type` parameter, see the `IGroupForm` plugin interface.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: the name of the organization, a string between 2 and 100 characters long, containing only lowercase alphanumeric characters, `-`, and `_`
+                id:
+                  type: string
+                  description: the id of the organization
+                title:
+                  type: string
+                  description: the title of the organization
+                description:
+                  type: string
+                  description: the description of the organization
+                image_url:
+                  type: string
+                  description: the URL to an image to be displayed on the organization's page
+                state:
+                  type: string
+                  description: "the current state of the organization, e.g. `'active'` or `'deleted'`, only active organization show up in search results and other lists of organization, this parameter will be ignored if you are not authorized to change the state of the organization (default: `'active'`)"
+                approval_status:
+                  type: string
+                extras:
+                  type: array
+                  description: "the organization's extras, extras are arbitrary (key: value) metadata items that can be added to organization, each extra dictionary should have keys `'key'` (a string), `'value'` (a string), and optionally `'deleted'`"
+                  items:
+                    type: object
+                    additionalProperties: true
+                packages:
+                  type: array
+                  description: "the datasets (packages) that belong to the organization, a list of dictionaries each with keys `'name'` (string, the id or name of the dataset) and optionally `'title'` (string, the title of the dataset)"
+                  items:
+                    type: object
+                    additionalProperties: true
+                users:
+                  type: array
+                  description: "the users that belong to the organization, a list of dictionaries each with key `'name'` (string, the id or name of the user) and optionally `'capacity'` (string, the capacity in which the user is a member of the organization)"
+                  items:
+                    type: object
+                    additionalProperties: true
+  user_create:
+    post:
+      operationId: user_create
+      summary: user_create
+      description: |
+        Create a new user.
+
+        You must be authorized to create users.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: the name of the new user, a string between 2 and 100 characters long, containing only lowercase alphanumeric characters, `-`, and `_`
+                email:
+                  type: string
+                  description: the email address for the new user
+                password:
+                  type: string
+                  description: the password of the new user, a string of at least 4 characters
+                id:
+                  type: string
+                  description: the id of the new user
+                fullname:
+                  type: string
+                  description: the full name of the new user
+                about:
+                  type: string
+                  description: a description of the new user
+                image_url:
+                  type: string
+                  # Original docs say "group's page" which should be fixed
+                  description: the URL to an image to be displayed on the user's page
+                plugin_extras:
+                  type: object
+                  description: |
+                    private extra user data belonging to plugins. Only sysadmin users may set this value. It should be a dict that can be dumped into JSON, and plugins should namespace their extras with the plugin name to avoid collisions with other plugins, e.g.:
+
+                    ```json
+                    {
+                        "name": "test_user",
+                        "email": "test@example.com",
+                        "plugin_extras": {
+                            "my_plugin": {
+                                "private_extra": 1
+                            },
+                            "another_plugin": {
+                                "another_extra": True
+                            }
+                        }
+                    }
+                    ```
+                  additionalProperties: true
+                with_apitoken:
+                  type: boolean
+                  description: whether to create an API token for the user
+  user_invite:
+    post:
+      operationId: user_invite
+      summary: user_invite
+      description: |
+        Invite a new user.
+
+        You must be authorized to create group members.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: the email of the user to be invited to the group
+                group_id:
+                  type: string
+                  description: the id or name of the group
+                role:
+                  type: string
+                  description: role of the user in the group. One of `member`, `editor`, or `admin`
+  vocabulary_create:
+    post:
+      operationId: vocabulary_create
+      summary: vocabulary_create
+      description: |
+        Create a new tag vocabulary.
+
+        You must a sysadmin to create vocabularies.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: the name of the new vocabulary, e.g. `'Genre'`
+                tags:
+                  type: array
+                  description: the new tags to add to the new vocabulary, for the format of tag dictionaries see `tag_create()`
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: "the name for the new tag, a string between 2 and 100 characters long containing only alphanumeric characters, spaces and the characters `-`, `_`, and `.`, e.g. `'Fruits'`"
+                      vocabulary_id:
+                        type: string
+                        description: "the id of the vocabulary that the new tag should be added to, e.g. the id of vocabulary `'Genre'`"
+  tag_create:
+    post:
+      operationId: tag_create
+      summary: tag_create
+      description: |
+        Create a new vocabulary tag.
+
+        You must be a sysadmin to create vocabulary tags.
+
+        You can only use this function to create tags that belong to a vocabulary, not to create free tags. (To create a new free tag simply add the tag to a package, e.g. using the `package_update()` function.)
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "the name for the new tag, a string between 2 and 100 characters long containing only alphanumeric characters, spaces and the characters `-`, `_`, and `.`, e.g. `'Fruits'`"
+                vocabulary_id:
+                  type: string
+                  description: "the id of the vocabulary that the new tag should be added to, e.g. the id of vocabulary `'Genre'`"
+  follow_user:
+    post:
+      operationId: follow_user
+      summary: follow_user
+      description: |
+        Start following another user.
+
+        You must provide your API key in the Authorization header.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: "the id or name of the user to follow, e.g. `'joeuser'`"
+  follow_dataset:
+    post:
+      operationId: follow_dataset
+      summary: follow_dataset
+      description: |
+        Start following a dataset.
+
+        You must provide your API key in the Authorization header.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: "the id or name of the dataset to follow, e.g. `'inventory'`"
+  group_member_create:
+    post:
+      operationId: group_member_create
+      summary: group_member_create
+      description: |
+        Make a user a member of a group.
+
+        You must be authorized to edit the group.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the group
+                username:
+                  type: string
+                  description: name or id of the user to be made member of the group
+                role:
+                  type: string
+                  description: "role of the user in the group. One of `member`, `editor`, or `admin`"
+  organization_member_create:
+    post:
+      operationId: organization_member_create
+      summary: organization_member_create
+      description: |
+        Make a user a member of an organization.
+
+        You must be authorized to edit the organization.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the organization
+                username:
+                  type: string
+                  description: name or id of the user to be made member of the organization
+                role:
+                  type: string
+                  description: "role of the user in the organization. One of `member`, `editor`, or `admin`"
+  follow_group:
+    post:
+      operationId: follow_group
+      summary: follow_group
+      description: |
+        Start following a group.
+
+        You must provide your API key in the Authorization header.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: "the id or name of the group to follow, e.g. `'roger'`"
+  api_token_create:
+    post:
+      operationId: api_token_create
+      summary: api_token_create
+      description: |
+        Create new API Token for current user.
+
+        Apart from the `user` and `name` field that are required by default implementation, there may be additional fields registered by extensions.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: string
+                  description: name or id of the user who owns new API Token
+                name:
+                  type: string
+                  description: distinctive name for API Token
