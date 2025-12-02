@@ -1669,3 +1669,231 @@ paths:
                 upload:
                   type: string
                   format: binary
+  resource_view_create:
+    post:
+      operationId: resource_view_create
+      summary: resource_view_create
+      description: |
+        Creates a new resource view.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resource_id:
+                  type: string
+                  description: id of the resource
+                title:
+                  type: string
+                  description: the title of the view
+                description:
+                  type: string
+                  description: a description of the view
+                view_type:
+                  type: string
+                  description: type of view
+                config:
+                  type: string
+                  description: (JSON string) options necessary to recreate a view state
+  resource_create_default_resource_views:
+    post:
+      operationId: resource_create_default_resource_views
+      summary: resource_create_default_resource_views
+      description: |
+        Creates the default views (if necessary) on the provided resource
+
+        The function will get the plugins for the default views defined in the configuration, and if some were found the `can_view` method of each one of them will be called to determine if a resource view should be created. Resource views extensions get the resource dict and the parent dataset dict.
+
+        If the latter is not provided, `package_show` is called to get it.
+
+        By default only view plugins that don't require the resource data to be in the DataStore are called. See `ckan.logic.action.create.package_create_default_resource_views()` for details on the `create_datastore_views` parameter.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                resource:
+                  type: object
+                  description: full resource dict
+                  additionalProperties: true
+                package:
+                  type: object
+                  description: full dataset dict (if not provided, `package_show()` will be called)
+                  additionalProperties: true
+                create_datastore_views:
+                  type: boolean
+                  description: "whether to create views that rely on data being on the DataStore (default: `False`)"
+  package_create_default_resource_views:
+    post:
+      operationId: package_create_default_resource_views
+      summary: package_create_default_resource_views
+      description: |
+        Creates the default views on all resources of the provided dataset
+
+        By default only view plugins that don't require the resource data to be in the DataStore are called. Passing `create_datastore_views` as `True` will only create views that require data to be in the DataStore. The first case happens when the function is called from `package_create` or `package_update`, the second when it's called from the DataPusher when data was uploaded to the DataStore.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                package:
+                  type: object
+                  description: full dataset dict (i.e. the one obtained calling `package_show()`)
+                  additionalProperties: true
+                create_datastore_views:
+                  type: boolean
+                  description: "whether to create views that rely on data being on the DataStore (default: `False`)"
+  package_relationship_create:
+    post:
+      operationId: package_relationship_create
+      summary: package_relationship_create
+      description: |
+        Create a relationship between two datasets (packages).
+
+        You must be authorized to edit both the subject and the object datasets.        
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subject:
+                  type: string
+                  description: the id or name of the dataset that is the subject of the relationship
+                object:
+                  type: string
+                  description: the id or name of the dataset that is the object of the relationship
+                type:
+                  type: string
+                  description: the type of the relationship, one of `'depends_on'`, `'dependency_of'`, `'derives_from'`, `'has_derivation', `'links_to'`, `'linked_from'`, `'child_of'`, or `'parent_of'`
+                comment:
+                  type: string
+                  description: a comment about the relationship
+  member_create:
+    post:
+      operationId: member_create
+      summary: member_create
+      description: |
+        Make an object (e.g. a user, dataset or group) a member of a group.
+
+        If the object is already a member of the group then the capacity of the membership will be updated.
+
+        You must be authorized to edit the group.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the group to add the object to
+                object:
+                  type: string
+                  description: the id or name of the object to add
+                object_type:
+                  type: string
+                  description: the type of the object being added, e.g. `'package'` or `'user'`
+                capacity:
+                  type: string
+                  description: the capacity of the membership
+  package_collaborator_create:
+    post:
+      operationId: package_collaborator_create
+      summary: package_collaborator_create
+      description: |
+        Make a user a collaborator in a dataset.
+
+        If the user is already a collaborator in the dataset then their capacity will be updated.
+
+        Currently you must be an Admin on the dataset owner organization to manage collaborators.
+
+        Note: This action requires the collaborators feature to be enabled with the [`ckan.auth.allow_dataset_collaborators`](https://docs.ckan.org/en/2.11/maintaining/configuration.html#ckan-auth-allow-dataset-collaborators) configuration option.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the dataset
+                user_id:
+                  type: string
+                  description: the id or name of the user to add or edit
+                capacity:
+                  type: string
+                  description: the capacity or role of the membership. Must be one of "editor" or "member". Additionally if [`ckan.auth.allow_admin_collaborators`](https://docs.ckan.org/en/2.11/maintaining/configuration.html#ckan-auth-allow-admin-collaborators) is set to `True`, "admin" is also allowed.
+  group_create:
+    post:
+      operationId: group_create
+      summary: group_create
+      description: |
+        Create a new group.
+
+        You must be authorized to create groups.
+
+        Plugins may change the parameters of this function depending on the value of the `type` parameter, see the `IGroupForm` plugin interface.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: the name of the group, a string between 2 and 100 characters long, containing only lowercase alphanumeric characters, `-`, and `_`
+                id:
+                  type: string
+                  description: the id of the group
+                title:
+                  type: string
+                  description: the title of the group
+                description:
+                  type: string
+                  description: the description of the group
+                image_url:
+                  type: string
+                  description: the URL to an image to be displayed on the group's page
+                type:
+                  type: string
+                  description: "the type of the group (default: `'group'`), `IGroupForm` plugins associate themselves with different group types and provide custom group handling behavior for these types cannot be 'organization'"
+                state:
+                  type: string
+                  description: "the current state of the group, e.g. `'active'` or `'deleted'`, only active groups show up in search results and other lists of groups, this parameter will be ignored if you are not authorized to change the state of the group (default: `'active'`)"
+                approval_status:
+                  type: string
+                extras:
+                  type: array
+                  description: "the group's extras, extras are arbitrary (key: value) metadata items that can be added to groups, each extra dictionary should have keys `'key'` (a string), `'value'` (a string), and optionally `'deleted'`"
+                  items:
+                    type: object
+                    additionalProperties: true
+                packages:
+                  type: array
+                  description: "the datasets (packages) that belong to the group, a list of dictionaries each with keys `'name'` (string, the id or name of the dataset) and optionally `'title'` (string, the title of the dataset)"
+                  items:
+                    type: object
+                    additionalProperties: true
+                groups:
+                  type: array
+                  description: "the groups that belong to the group, a list of dictionaries each with key `'name'` (string, the id or name of the group) and optionally `'capacity'` (string, the capacity in which the group is a member of the group)"
+                  items:
+                    type: object
+                    additionalProperties: true
+                users:
+                  type: array
+                  description: "the users that belong to the group, a list of dictionaries each with key `'name'` (string, the id or name of the user) and optionally `'capacity'` (string, the capacity in which the user is a member of the group)"
+                  items:
+                    type: object
+                    additionalProperties: true
