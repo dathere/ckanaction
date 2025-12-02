@@ -1623,3 +1623,49 @@ paths:
                 owner_org:
                   type: string
                   description: "the id of the dataset's owning organization, see `organization_list()` or `organization_list_for_user()` for available values. This parameter can be made optional if the config option [`ckan.auth.create_unowned_dataset`](https://docs.ckan.org/en/2.11/maintaining/configuration.html#ckan-auth-create-unowned-dataset) is set to `True`."
+  resource_create:
+    post:
+      operationId: resource_create
+      summary: resource_create
+      description: |
+        Appends a new resource to a datasets list of resources.
+      requestBody:
+        required: false
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                package_id:
+                  type: string
+                  description: id of package that the resource should be added to
+                url:
+                  type: string
+                  description: url of resource
+                description:
+                  type: string
+                format:
+                  type: string
+                hash:
+                  type: string
+                name:
+                  type: string
+                resource_type:
+                  type: string
+                mimetype:
+                  type: string
+                mimetype_inner:
+                  type: string
+                cache_url:
+                  type: string
+                size:
+                  type: integer
+                created:
+                  type: string
+                last_modified:
+                  type: string
+                cache_last_updated:
+                  type: string
+                upload:
+                  type: string
+                  format: binary
