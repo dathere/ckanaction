@@ -6,7 +6,15 @@ const withMDX = createMDX();
 const config = {
   reactStrictMode: true,
   devIndicators: false,
-  transpilePackages: ["shiki"]
+  transpilePackages: ["shiki"],
+  async rewrites() {
+    return [
+      {
+        source: "/docs/:path*.mdx",
+        destination: "/llms.mdx/:path*"
+      }
+    ]
+  }
 };
 
 export default withMDX(config);

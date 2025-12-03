@@ -3,7 +3,6 @@ title: package_create_default_resource_views
 full: true
 _openapi:
   method: POST
-  route: package_create_default_resource_views
   toc: []
   structuredData:
     headings: []
@@ -27,4 +26,4 @@ Creates the default views on all resources of the provided dataset
 By default only view plugins that don't require the resource data to be in the DataStore are called. Passing `create_datastore_views` as `True` will only create views that require data to be in the DataStore. The first case happens when the function is called from `package_create` or `package_update`, the second when it's called from the DataPusher when data was uploaded to the DataStore.
 
 
-<APIPage document={"./lib/openapi.yml"} operations={[{"path":"package_create_default_resource_views","method":"post"}]} webhooks={[]} hasHead={false} />
+<APIPage document={"./lib/openapi.yml"} operations={[{"path":"package_create_default_resource_views","method":"post"}]} />

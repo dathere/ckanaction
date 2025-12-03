@@ -1,13 +1,12 @@
+import { docs } from "fumadocs-mdx:collections/server";
 import { type InferPageType, loader } from "fumadocs-core/source";
 import { lucideIconsPlugin } from "fumadocs-core/source/lucide-icons";
 import { openapiPlugin } from "fumadocs-openapi/server";
-import { docs } from "@/.source";
 
 // See https://fumadocs.dev/docs/headless/source-api for more info
 export const source = loader({
   baseUrl: "/docs",
   source: docs.toFumadocsSource(),
-  // @ts-expect-error
   plugins: [lucideIconsPlugin(), openapiPlugin()],
 });
 
@@ -21,7 +20,6 @@ export function getPageImage(page: InferPageType<typeof source>) {
 }
 
 export async function getLLMText(page: InferPageType<typeof source>) {
-  // @ts-expect-error
   const processed = await page.data.getText("processed");
 
   return `# ${page.data.title} (${page.url})
