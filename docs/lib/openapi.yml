@@ -2212,3 +2212,480 @@ paths:
                 name:
                   type: string
                   description: distinctive name for API Token
+  user_delete:
+    delete:
+      operationId: user_delete
+      summary: user_delete
+      description: |
+        Delete a user.
+
+        Only sysadmins can delete users.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  # Original docs say "usernamename" which is a typo that should be fixed
+                  description: the id or name of the user to delete
+  package_delete:
+    delete:
+      operationId: package_delete
+      summary: package_delete
+      description: |
+        Delete a dataset (package).
+
+        This makes the dataset disappear from all web & API views, apart from the trash.
+
+        You must be authorized to delete the dataset.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the dataset to delete
+  dataset_purge:
+    delete:
+      operationId: dataset_purge
+      summary: dataset_purge
+      # Original docs say "Purging a database" which may be a typo for "Purging a dataset"
+      description: |
+        Purge a dataset.
+
+        <Callout title="Warning!" type="warn">Purging a dataset cannot be undone!</Callout>
+        
+        Purging a dataset completely removes the dataset from the CKAN database, whereas deleting a dataset simply marks the dataset as deleted (it will no longer show up in the front-end, but is still in the db).
+
+        You must be authorized to purge the dataset.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the dataset to be purged
+  resource_delete:
+    delete:
+      operationId: resource_delete
+      summary: resource_delete
+      description: |
+        Delete a resource from a dataset.
+
+        You must be a sysadmin or the owner of the resource to delete it.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the resource
+  resource_view_delete:
+    delete:
+      operationId: resource_view_delete
+      summary: resource_view_delete
+      description: |
+        Delete a resource_view.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the resource_view
+  resource_view_clear:
+    delete:
+      operationId: resource_view_clear
+      summary: resource_view_clear
+      description: |
+        Delete all resource views, or all of a particular type.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                view_types:
+                  type: array
+                  description: specific types to delete
+                  items:
+                    type: string
+  package_relationship_delete:
+    delete:
+      operationId: package_relationship_delete
+      summary: package_relationship_delete
+      description: |
+        Delete a dataset (package) relationship.
+
+        You must be authorised to delete dataset relationships, and to edit both the subject and the object datasets.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subject:
+                  type: string
+                  description: the id or name of the dataset that is the subject of the relationship
+                object:
+                  type: string
+                  description: the id or name of the dataset that is the object of the relationship
+                type:
+                  type: string
+                  description: the type of the relationship
+  member_delete:
+    delete:
+      operationId: member_delete
+      summary: member_delete
+      description: |
+        Remove an object (e.g. a user, dataset or group) from a group.
+
+        You must be authorized to edit a group to remove objects from it.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the group
+                object:
+                  type: string
+                  description: the id or name of the object to be removed
+                object_type:
+                  type: string
+                  description: the type of the object to be removed, e.g. `package` or `user`
+  package_collaborator_delete:
+    delete:
+      operationId: package_collaborator_delete
+      summary: package_collaborator_delete
+      description: |
+        Remove a collaborator from a dataset.
+
+        Currently you must be an Admin on the dataset owner organization to manage collaborators.
+
+        Note: This action requires the collaborators feature to be enabled with the [`ckan.auth.allow_dataset_collaborators`](https://docs.ckan.org/en/2.11/maintaining/configuration.html#ckan-auth-allow-dataset-collaborators) configuration option.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the dataset
+                user_id:
+                  type: string
+                  description: the id or name of the user to remove
+  group_delete:
+    delete:
+      operationId: group_delete
+      summary: group_delete
+      description: |
+        Delete a group.
+
+        You must be authorized to delete the group.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the name or id of the group
+  organization_delete:
+    delete:
+      operationId: organization_delete
+      summary: organization_delete
+      description: |
+        Delete an organization.
+
+        You must be authorized to delete the organization and no datasets should belong to the organization unless `'ckan.auth.create_unowned_dataset=True'`
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the name or id of the organization
+  group_purge:
+    delete:
+      operationId: group_purge
+      summary: group_purge
+      # Original docs say "Datasets in the organization will remain", however this should probably say "in the group"
+      description: |
+        Purge a group.
+
+        <Callout title="Warning!" type="warn">Purging a group cannot be undone!</Callout>
+
+        Purging a group completely removes the group from the CKAN database, whereas deleting a group simply marks the group as deleted (it will no longer show up in the frontend, but is still in the db).
+
+        Datasets in the group will remain, just not in the purged group.
+
+        You must be authorized to purge the group.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the name or id of the group to be purged
+  organization_purge:
+    delete:
+      operationId: organization_purge
+      summary: organization_purge
+      # Original docs say "any more" when it should be "anymore"
+      description: |
+        Purge an organization.
+
+        <Callout title="Warning!" type="warn">Purging an organization cannot be undone!</Callout>
+
+        Purging an organization completely removes the organization from the CKAN database, whereas deleting a organization simply marks the organization as deleted (it will no longer show up in the frontend, but is still in the db).
+
+        Datasets owned by the organization will remain, just not in an organization anymore.
+
+        You must be authorized to purge the organization.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the name or id of the organization to be purged
+  task_status_delete:
+    delete:
+      operationId: task_status_delete
+      summary: task_status_delete
+      description: |
+        Delete a task status.
+
+        You must be a sysadmin to delete task statuses.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the task status to delete
+  vocabulary_delete:
+    delete:
+      operationId: vocabulary_delete
+      summary: vocabulary_delete
+      description: |
+        Delete a tag vocabulary.
+
+        You must be a sysadmin to delete vocabularies.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the vocabulary
+  tag_delete:
+    delete:
+      operationId: tag_delete
+      summary: tag_delete
+      description: |
+        Delete a tag.
+
+        You must be a sysadmin to delete tags.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the tag
+                vocabulary_id:
+                  type: string
+                  description: "the id or name of the vocabulary that the tag belongs to (default: `None`)"
+  unfollow_user:
+    delete:
+      operationId: unfollow_user
+      summary: unfollow_user
+      description: |
+        Stop following a user.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the user to stop following
+  unfollow_dataset:
+    delete:
+      operationId: unfollow_dataset
+      summary: unfollow_dataset
+      description: |
+        Stop following a dataset.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the dataset to stop following
+  group_member_delete:
+    delete:
+      operationId: group_member_delete
+      summary: group_member_delete
+      description: |
+        Remove a user from a group.
+
+        You must be authorized to edit the group.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the group
+                username:
+                  type: string
+                  description: name or id of the user to be removed
+  organization_member_delete:
+    delete:
+      operationId: organization_member_delete
+      summary: organization_member_delete
+      description: |
+        Remove a user from an organization.
+
+        You must be authorized to edit the organization.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the organization
+                username:
+                  type: string
+                  description: name or id of the user to be removed
+  unfollow_group:
+    delete:
+      operationId: unfollow_group
+      summary: unfollow_group
+      description: |
+        Stop following a group.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the group to stop following
+  job_clear:
+    delete:
+      operationId: job_clear
+      summary: job_clear
+      description: |
+        Clear background job queues.
+
+        Does not affect jobs that are already being processed.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                queues:
+                  type: array
+                  description: The queues to clear. If not given then ALL queues are cleared.
+                  items:
+                    type: string
+  job_cancel:
+    delete:
+      operationId: job_cancel
+      summary: job_cancel
+      description: |
+        Cancel a queued background job.
+
+        Removes the job from the queue and deletes it.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: The ID of the background job.
+  api_token_revoke:
+    delete:
+      operationId: api_token_revoke
+      summary: api_token_revoke
+      description: |
+        Delete API Token.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  # Original docs don't have a space between remove and (
+                  description: Token to remove (required if `jti` not specified)
+                jti:
+                  type: string
+                  # Original docs don't capitalize D in ID and don't have space between remove and (
+                  description: ID of the token to remove (overrides `token` if specified)
