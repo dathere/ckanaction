@@ -2212,6 +2212,886 @@ paths:
                 name:
                   type: string
                   description: distinctive name for API Token
+  resource_update:
+    put:
+      operationId: resource_update
+      summary: resource_update
+      description: |
+        Update a resource.
+
+        To update a resource you must be authorized to update the dataset that the resource belongs to.
+
+        <Callout title="Note">Update methods may delete parameters not explicitly provided in the data_dict. If you want to edit only a specific attribute use `resource_patch` instead.</Callout>
+      requestBody:
+        required: false
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the resource to update
+                package_id:
+                  type: string
+                  description: id of package that the resource should be added to
+                url:
+                  type: string
+                  description: url of resource
+                description:
+                  type: string
+                format:
+                  type: string
+                hash:
+                  type: string
+                name:
+                  type: string
+                resource_type:
+                  type: string
+                mimetype:
+                  type: string
+                mimetype_inner:
+                  type: string
+                cache_url:
+                  type: string
+                size:
+                  type: integer
+                created:
+                  type: string
+                last_modified:
+                  type: string
+                cache_last_updated:
+                  type: string
+                upload:
+                  type: string
+                  format: binary
+  resource_view_update:
+    put:
+      operationId: resource_view_update
+      summary: resource_view_update
+      description: |
+        Update a resource view.
+
+        To update a resource_view you must be authorized to update the resource that the resource_view belongs to.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the resource_view to update
+                resource_id:
+                  type: string
+                  description: id of the resource
+                title:
+                  type: string
+                  description: the title of the view
+                description:
+                  type: string
+                  description: a description of the view
+                view_type:
+                  type: string
+                  description: type of view
+                config:
+                  type: string
+                  description: (JSON string) options necessary to recreate a view state
+  resource_view_reorder:
+    put:
+      operationId: resource_view_reorder
+      summary: resource_view_reorder
+      description: |
+        Reorder resource views.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the resource
+                order:
+                  type: array
+                  description: the list of id of the resource to update the order of the views
+                  items:
+                    type: string
+  package_update:
+    put:
+      operationId: package_update
+      summary: package_update
+      description: |
+        Update a dataset (package).
+
+        You must be authorized to edit the dataset and the groups that it belongs to.
+
+        <Callout title="Note">Update methods may delete parameters not explicitly provided in the data_dict. If you want to edit only a specific attribute use `package_patch` instead.</Callout>
+
+        It is recommended to call `ckan.logic.action.get.package_show()`, make the desired changes to the result, and then call `package_update()` with it.
+
+        Plugins may change the parameters of this function depending on the value of the dataset's `type` attribute, see the `IDatasetForm` plugin interface.
+      requestBody:
+        required: false
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the name or id of the dataset to update
+                name:
+                  type: string
+                  description: the name of the new dataset, must be between 2 and 100 characters long and contain only lowercase alphanumeric characters, `-` and `_`
+                title:
+                  type: string
+                  description: "the title of the dataset (default: same as `name`)"
+                private:
+                  type: boolean
+                  description: "if `True` creates a private dataset"
+                author:
+                  type: string
+                  description: the name of the dataset's author
+                author_email:
+                  type: string
+                  description: the email address of the dataset's author
+                maintainer:
+                  type: string
+                  description: the name of the dataset's maintainer
+                maintainer_email:
+                  type: string
+                  description: the email address of the dataset's maintainer
+                license_id:
+                  type: string
+                  description: the id of the dataset's license, see `license_list()` for available values
+                notes:
+                  type: string
+                  description: a description of the dataset
+                url:
+                  type: string
+                  description: a URL for the dataset's source
+                version:
+                  type: string
+                  description: no longer than 100 characters
+                state:
+                  type: string
+                  description: "the current state of the dataset, e.g. `'active'` or `'deleted'`, only active datasets show up in search results and other lists of datasets, thsi parameter will be ignored if you are not authorized to change the state of the dataset (default: `'active`')"
+                type:
+                  type: string
+                  description: the type of the dataset, `IDatasetForm` plugins associate themselves with different dataset types and provide custom dataset handling behaviour for these types
+                resources:
+                  type: array
+                  description: the dataset's resources
+                  items:
+                    type: object
+                    properties:
+                      package_id:
+                        type: string
+                        description: id of package that the resource should be added to
+                      url:
+                        type: string
+                        description: url of resource
+                      description:
+                        type: string
+                      format:
+                        type: string
+                      hash:
+                        type: string
+                      name:
+                        type: string
+                      resource_type:
+                        type: string
+                      mimetype:
+                        type: string
+                      mimetype_inner:
+                        type: string
+                      cache_url:
+                        type: string
+                      size:
+                        type: integer
+                      created:
+                        type: string
+                      last_modified:
+                        type: string
+                      cache_last_updated:
+                        type: string
+                      upload:
+                        type: string
+                        format: binary
+                tags:
+                  type: array
+                  description: the dataset's tags
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: "the name for the new tag, a string between 2 and 100 characters long containing only alphanumeric characters, spaces and the characters `-`, `_` and `.`, e.g. `'Jazz'`"
+                      vocabulary_id:
+                        type: string
+                        description: "the id of the vocabulary that the new tag should be added to, e.g. the id of vocabulary `'Genre'`"
+                extras:
+                  type: array
+                  description: "the dataset's extras, extras are arbitrary (key: value) metadata items that can be added to datasets, each extra dictionary should have keys `'key'` (a string), `'value'` (a string)"
+                  items:
+                    type: object
+                    additionalProperties: true
+                plugin_data:
+                  type: object
+                  description: |
+                    Private package data belonging to plugins. Only sysadmin users may set this value. It should be a dict that can be dumped into JSON, and plugins should namespace their data with the plugin name to avoid collisions with other plugins, e.g.:
+
+                    ```json
+                    {
+                        "name": "test-dataset",
+                        "plugin_data": {
+                            "plugin1": {"key1": "value1"},
+                            "plugin2": {"key2": "value2"}
+                        }
+                    }
+                    ```
+                  additionalProperties: true
+                relationships_as_object:
+                  type: array
+                  description: list of relationship dictionaries
+                  items:
+                    type: object
+                    properties:
+                      subject:
+                        type: string
+                        description: the id or name of the dataset that is the subject of the relationship
+                      object:
+                        type: string
+                        description: the id or name of the dataset that is the object of the relationship
+                      type:
+                        type: string
+                        description: "the type of the relationship, one of `'depends_on'`, `'dependency_of'`, `'derives_from'`, `'has_derivation'`, `'links_to'`, `'linked_from'`, `'child_of'` or `'parent_of'`"
+                      comment:
+                        type: string
+                        description: a comment about the relationship
+                relationships_as_subject:
+                  type: array
+                  description: list of relationship dictionaries
+                  items:
+                    type: object
+                    properties:
+                      subject:
+                        type: string
+                        description: the id or name of the dataset that is the subject of the relationship
+                      object:
+                        type: string
+                        description: the id or name of the dataset that is the object of the relationship
+                      type:
+                        type: string
+                        description: "the type of the relationship, one of `'depends_on'`, `'dependency_of'`, `'derives_from'`, `'has_derivation'`, `'links_to'`, `'linked_from'`, `'child_of'` or `'parent_of'`"
+                      comment:
+                        type: string
+                        description: a comment about the relationship
+                groups:
+                  type: array
+                  description: "the groups to which the dataset belongs, each group dictionary should have one or more of the following keys which identify an existing group: `'id'` (the id of the group, string), or `'name'` (the name of the group, string), to see which groups exist call `group_list()`"
+                  items:
+                    type: object
+                    additionalProperties: true
+                owner_org:
+                  type: string
+                  description: "the id of the dataset's owning organization, see `organization_list()` or `organization_list_for_user()` for available values. This parameter can be made optional if the config option [`ckan.auth.create_unowned_dataset`](https://docs.ckan.org/en/2.11/maintaining/configuration.html#ckan-auth-create-unowned-dataset) is set to `True`."
+  package_revise:
+    put:
+      operationId: package_revise
+      summary: package_revise
+      description: |
+        Revise a dataset (package) selectively with match, filter, and update parameters.
+
+        You must be authorized to edit the dataset and the groups that it belongs to.
+
+        `match` and `update` parameters may also be passed as "flattened keys", using either the item numeric index or its unique id (with a minimum of 5 characters), e.g. `update__resource__1f9ab__description="guidebook"` would set the description of the resource with id starting with "1f9ab" to "guidebook", and `update__resource__-1__description="guidebook"` would do the same on the last resource in the dataset.
+
+        The `extend` suffix can also be used on the update parameter to add a new item to a list, e.g. `update__resources__extend=[{"name": "new resource", "url": "https://example.com"}]` will add a new resource to the dataset with the provided `name` and `url`.
+
+        Usage examples:
+
+        - Change description in dataset, checking for old description:
+
+        ```
+        match={"notes": "old notes", "name": "xyz"}
+        update={"notes": "new notes"}
+        ```
+
+        - Identical to above, but using flattened keys:
+
+        ```
+        match__name="xyz"
+        match__notes="old notes"
+        update__notes="new notes"
+        ```
+        
+        - Replace all fields at dataset level only, keep resources (note: dataset id and type fields can’t be deleted)
+
+        ```
+        match={"id": "1234abc-1420-cbad-1922"}
+        filter=["+resources", "-*"]
+        update={"name": "fresh-start", "title": "Fresh Start"}
+        ```
+
+        - Add a new resource (__extend on flattened key):
+
+        ```
+        match={"id": "abc0123-1420-cbad-1922"}
+        update__resources__extend=[{"name": "new resource", "url": "http://example.com"}]
+        ```
+
+        - Update a resource by its index:
+
+        ```
+        match={"name": "my-data"}
+        update__resources__0={"name": "new name, first resource"}
+        ```
+
+        - Update a resource by its id (provide at least 5 characters):
+
+        ```
+        match={"name": "their-data"}
+        update__resources__19cfad={"description": "right one for sure"}
+        ```
+
+        - Replace all fields of a resource:
+
+        ```
+        match={"id": "34a12bc-1420-cbad-1922"}
+        filter=["+resources__1492a__id", "-resources__1492a__*"]
+        update__resources__1492a={"name": "edits here", "url": "http://example.com"}
+        ```
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                match:
+                  type: object
+                  description: "a dict containing \"id\" or \"name\" values of the dataset to update, all values provided must match the current dataset values or a `ValidationError` will be raised. e.g. `{\"name\": \"my-data\", \"resources\": {[\"name\": \"big.csv\"]}}` would abort if the `my-data` dataset's first resource name is not \"big.csv\"."
+                  additionalProperties: true
+                filter:
+                  type: array
+                  description: "a list of string patterns of fields to remove from the current dataset. e.g. `\"-resources__1\"` would remove the second resource, `\"+title, +resources, -*\"` would remove all fields at the dataset level except title and all resources (default: `[]`)"
+                  items:
+                    type: string
+                update:
+                  type: object
+                  description: "a dict with values to update/create after filtering e.g. `{\"resources\": [{\"description\": \"file here\"}]}` would update the description for the first resource"
+                  additionalProperties: true
+                include:
+                  type: array
+                  description: "a list of string pattern of fields to include in response e.g. `\"-*\"` to return nothing (default: `[]` all fields returned)"
+                  items:
+                    type: string
+  package_resource_reorder:
+    put:
+      operationId: package_resource_reorder
+      summary: package_resource_reorder
+      description: |
+        Reorder resources against datasets. If only partial resource ids are supplied then these are assumed to be first and the other resources will stay in their original order.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id or name of the package to update
+                order:
+                  type: array
+                  description: a list of resource ids in the order needed
+                  items:
+                    type: string
+  package_relationship_update:
+    put:
+      operationId: package_relationship_update
+      summary: package_relationship_update
+      description: |
+        Update a relationship between two datasets (packages).
+
+        The subject, object and type parameters are required to identify the relationship. Only the comment can be updated.
+
+        You must be authorized to edit both the subject and the object datasets.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subject:
+                  type: string
+                  description: the name or id of teh dataset that is the subject of the relationship
+                object:
+                  type: string
+                  description: the name or id of the dataset that is the object of the relationship
+                type:
+                  type: string
+                  description: the type of the relationship, one of `'depends_on'`, `'dependency_of'`, `'derives_from'`, `'has_derivation'`, `'links_to'`, `'linked_from'`, `'child_of'`, or `'parent_of'`
+                comment:
+                  type: string
+                  description: a comment about the relationship
+  group_update:
+    put:
+      operationId: group_update
+      summary: group_update
+      description: |
+        Update a group.
+
+        You must be authorized to edit the group.
+
+        <Callout title="Note">Update methods may delete parameters not explicitly provided in the data_dict. If you want to edit only a specific attribute use `group_patch` instead.</Callout>
+
+        Plugins may change the parameters of this function depending on the value of the group's `type` attribute, see the `IGroupForm` plugin interface.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the name or id of the group to update
+                name:
+                  type: string
+                  description: the name of the group, a string between 2 and 100 characters long, containing only lowercase alphanumeric characters, `-`, and `_`
+                title:
+                  type: string
+                  description: the title of the group
+                description:
+                  type: string
+                  description: the description of the group
+                image_url:
+                  type: string
+                  description: the URL to an image to be displayed on the group's page
+                type:
+                  type: string
+                  description: "the type of the group (default: `'group'`), `IGroupForm` plugins associate themselves with different group types and provide custom group handling behavior for these types cannot be 'organization'"
+                state:
+                  type: string
+                  description: "the current state of the group, e.g. `'active'` or `'deleted'`, only active groups show up in search results and other lists of groups, this parameter will be ignored if you are not authorized to change the state of the group (default: `'active'`)"
+                approval_status:
+                  type: string
+                extras:
+                  type: array
+                  description: "the group's extras, extras are arbitrary (key: value) metadata items that can be added to groups, each extra dictionary should have keys `'key'` (a string), `'value'` (a string), and optionally `'deleted'`"
+                  items:
+                    type: object
+                    additionalProperties: true
+                packages:
+                  type: array
+                  description: "the datasets (packages) that belong to the group, a list of dictionaries each with keys `'name'` (string, the id or name of the dataset) and optionally `'title'` (string, the title of the dataset)"
+                  items:
+                    type: object
+                    additionalProperties: true
+                groups:
+                  type: array
+                  description: "the groups that belong to the group, a list of dictionaries each with key `'name'` (string, the id or name of the group) and optionally `'capacity'` (string, the capacity in which the group is a member of the group)"
+                  items:
+                    type: object
+                    additionalProperties: true
+                users:
+                  type: array
+                  description: "the users that belong to the group, a list of dictionaries each with key `'name'` (string, the id or name of the user) and optionally `'capacity'` (string, the capacity in which the user is a member of the group)"
+                  items:
+                    type: object
+                    additionalProperties: true
+  organization_update:
+    put:
+      operationId: organization_update
+      summary: organization_update
+      # Original docs say "a organization" when it should be "an organization"
+      description: |
+        Update an organization.
+
+        You must be authorized to edit the organization.
+
+        <Callout title="Note">Update methods may delete parameters not explicitly provided in the data_dict. If you want to edit only a specific attribute use `organization_patch` instead.</Callout>
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the name or id of the organization to update
+                name:
+                  type: string
+                  description: the name of the organization, a string between 2 and 100 characters long, containing only lowercase alphanumeric characters, `-`, and `_`
+                title:
+                  type: string
+                  description: the title of the organization
+                description:
+                  type: string
+                  description: the description of the organization
+                image_url:
+                  type: string
+                  description: the URL to an image to be displayed on the organization's page
+                state:
+                  type: string
+                  description: "the current state of the organization, e.g. `'active'` or `'deleted'`, only active organization show up in search results and other lists of organization, this parameter will be ignored if you are not authorized to change the state of the organization (default: `'active'`)"
+                approval_status:
+                  type: string
+                extras:
+                  type: array
+                  description: "the organization's extras, extras are arbitrary (key: value) metadata items that can be added to organization, each extra dictionary should have keys `'key'` (a string), `'value'` (a string), and optionally `'deleted'`"
+                  items:
+                    type: object
+                    additionalProperties: true
+                packages:
+                  type: array
+                  description: "ignored. use `package_owner_org_update()` to change package ownership"
+                  items:
+                    type: object
+                    additionalProperties: true
+                users:
+                  type: array
+                  description: "the users that belong to the organization, a list of dictionaries each with key `'name'` (string, the id or name of the user) and optionally `'capacity'` (string, the capacity in which the user is a member of the organization)"
+                  items:
+                    type: object
+                    additionalProperties: true
+  user_update:
+    post:
+      operationId: user_update
+      summary: user_update
+      description: |
+        Update a user account.
+
+        Normal users can only update their own user accounts. Sysadmins can update any user account and modify existing usernames.
+
+        <Callout title="Note">Update methods may delete parameters not explicitly provided in the data_dict. If you want to edit only a specific attribute use `user_patch` instead.</Callout>
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the name or id of the user to update
+                name:
+                  type: string
+                  description: the name of the new user, a string between 2 and 100 characters long, containing only lowercase alphanumeric characters, `-`, and `_`
+                email:
+                  type: string
+                  description: the email address for the new user
+                password:
+                  type: string
+                  description: the password of the new user, a string of at least 4 characters
+                fullname:
+                  type: string
+                  description: the full name of the new user
+                about:
+                  type: string
+                  description: a description of the new user
+                image_url:
+                  type: string
+                  # Original docs say "group's page" which should be fixed
+                  description: the URL to an image to be displayed on the user's page
+                plugin_extras:
+                  type: object
+                  description: |
+                    private extra user data belonging to plugins. Only sysadmin users may set this value. It should be a dict that can be dumped into JSON, and plugins should namespace their extras with the plugin name to avoid collisions with other plugins, e.g.:
+
+                    ```json
+                    {
+                        "name": "test_user",
+                        "email": "test@example.com",
+                        "plugin_extras": {
+                            "my_plugin": {
+                                "private_extra": 1
+                            },
+                            "another_plugin": {
+                                "another_extra": True
+                            }
+                        }
+                    }
+                    ```
+                  additionalProperties: true
+                with_apitoken:
+                  type: boolean
+                  description: whether to create an API token for the user
+  task_status_update:
+    put:
+      operationId: task_status_update
+      summary: task_status_update
+      description: |
+        Update a task status.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the task status to update
+                entity_id:
+                  type: string
+                entity_type:
+                  type: string
+                task_type:
+                  type: string
+                key:
+                  type: string
+                value:
+                  type: string
+                state:
+                  type: string
+                last_updated:
+                  type: string
+                # Not sure about the type for this
+                error:
+                  type: string
+  task_status_update_many:
+    put:
+      operationId: task_status_update_many
+      summary: task_status_update_many
+      description: |
+        Update many task statuses at once.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  description: the task_status dictionaries to update
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: the id of the task status to update
+                      entity_id:
+                        type: string
+                      entity_type:
+                        type: string
+                      task_type:
+                        type: string
+                      key:
+                        type: string
+                      value:
+                        type: string
+                      state:
+                        type: string
+                      last_updated:
+                        type: string
+                      error:
+                        type: string
+  term_translation_update:
+    put:
+      operationId: term_translation_update
+      summary: term_translation_update
+      description: |
+        Create or update a term translation.
+
+        You must be a sysadmin to create or update term translations.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                term:
+                  type: string
+                  description: the term to be translated, in the original language, e.g. `'fruit'`
+                term_translation:
+                  type: string
+                  description: the translation of the term, e.g. `'obst'`
+                lang_code:
+                  type: string
+                  description: the language code of the translation, e.g. `'de'`
+  term_translation_update_many:
+    put:
+      operationId: term_translation_update_many
+      summary: term_translation_update_many
+      description: |
+        Create or update many term translations at once.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  description: the term translation dictionaries to create or update
+                  items:
+                    type: object
+                    properties:
+                      term:
+                        type: string
+                        description: the term to be translated, in the original language, e.g. `'fruit'`
+                      term_translation:
+                        type: string
+                        description: the translation of the term, e.g. `'obst'`
+                      lang_code:
+                        type: string
+                        description: the language code of the translation, e.g. `'de'`
+  vocabulary_update:
+    put:
+      operationId: vocabulary_update
+      summary: vocabulary_update
+      description: |
+        Update a tag vocabulary.
+
+        You must a sysadmin to update vocabularies.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the vocabulary to update
+                name:
+                  type: string
+                  description: the name of the new vocabulary, e.g. `'Genre'`
+                tags:
+                  type: array
+                  description: the new tags to add to the new vocabulary, for the format of tag dictionaries see `tag_create()`
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: "the name for the new tag, a string between 2 and 100 characters long containing only alphanumeric characters, spaces and the characters `-`, `_`, and `.`, e.g. `'Fruits'`"
+                      vocabulary_id:
+                        type: string
+                        description: "the id of the vocabulary that the new tag should be added to, e.g. the id of vocabulary `'Genre'`"
+  package_owner_org_update:
+    put:
+      operationId: package_owner_org_update
+      summary: package_owner_org_update
+      description: |
+        Update the owning organization of a dataset.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the name or id of the dataset to update
+                organization_id:
+                  type: string
+                  description: the name or id of the owning organization
+  bulk_update_private:
+    put:
+      operationId: bulk_update_private
+      summary: bulk_update_private
+      description: |
+        Make a list of datasets private.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                datasets:
+                  type: array
+                  description: list of ids of the datasets to update
+                  items:
+                    type: string
+                org_id:
+                  type: string
+                  description: id of the owning organization
+  bulk_update_public:
+    put:
+      operationId: bulk_update_public
+      summary: bulk_update_public
+      description: |
+        Make a list of datasets public.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                datasets:
+                  type: array
+                  description: list of ids of the datasets to update
+                  items:
+                    type: string
+                org_id:
+                  type: string
+                  description: id of the owning organization
+  bulk_update_delete:
+    put:
+      operationId: bulk_update_delete
+      summary: bulk_update_delete
+      description: |
+        Make a list of datasets deleted.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                datasets:
+                  type: array
+                  description: list of ids of the datasets to update
+                  items:
+                    type: string
+                org_id:
+                  type: string
+                  description: id of the owning organization
+  config_option_update:
+    put:
+      operationId: config_option_update
+      summary: config_option_update
+      description: |
+        Added in version 2.4.
+
+        Allows to modify some CKAN runtime-editable config options
+
+        It takes arbitrary key, value pairs and checks the keys against the config options update schema. If some of the provided keys are not present in the schema a `ValidationError` is raised. The values are then validated against the schema, and if validation is passed, for each key, value config option:
+
+        - It is stored on the `system_info` database table
+        - The Pylons `config` object is updated.
+        - The `app_globals` (`g`) object is updated (this only happens for options explicitly defined in the `app_globals` module.
+
+        <Callout title="Note">You can see all available runtime-editable configuration options calling the `config_option_list()` action.</Callout>
+
+        <Callout title="Note">Extensions can modify which configuration options are runtime-editable. For details, check [Making configuration options runtime-editable](https://docs.ckan.org/en/2.11/extensions/remote-config-update.html).</Callout>
+
+        <Callout title="Warning" type="warn">You should only add config options that you are comfortable they can be edited during runtime, such as ones you've added in your own extension, or have reviewed the use of in core CKAN.</Callout>
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: string
+                  description: a configuration option key (e.g. `ckan.site_title`). It must be present on the `update_configuration_schema`
   user_delete:
     delete:
       operationId: user_delete
