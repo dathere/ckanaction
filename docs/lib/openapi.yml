@@ -3092,6 +3092,410 @@ paths:
                 key:
                   type: string
                   description: a configuration option key (e.g. `ckan.site_title`). It must be present on the `update_configuration_schema`
+  package_patch:
+    patch:
+      operationId: package_patch
+      summary: package_patch
+      description: |
+        Patch a dataset (package).
+
+        The difference between the update and patch methods is that the patch will perform an update of the provided parameters, while leaving all other parameters unchanged, whereas the update methods deletes all parameters not explicitly provided in the data_dict.
+
+        To partially update resources or other metadata not at the top level of a package use `package_revise()` instead to maintain existing nested values.
+
+        You must be authorized to edit the dataset and the groups that it belongs to.
+      requestBody:
+        required: false
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the name or id of the dataset
+                name:
+                  type: string
+                  description: the name of the new dataset, must be between 2 and 100 characters long and contain only lowercase alphanumeric characters, `-` and `_`
+                title:
+                  type: string
+                  description: "the title of the dataset (default: same as `name`)"
+                private:
+                  type: boolean
+                  description: "if `True` creates a private dataset"
+                author:
+                  type: string
+                  description: the name of the dataset's author
+                author_email:
+                  type: string
+                  description: the email address of the dataset's author
+                maintainer:
+                  type: string
+                  description: the name of the dataset's maintainer
+                maintainer_email:
+                  type: string
+                  description: the email address of the dataset's maintainer
+                license_id:
+                  type: string
+                  description: the id of the dataset's license, see `license_list()` for available values
+                notes:
+                  type: string
+                  description: a description of the dataset
+                url:
+                  type: string
+                  description: a URL for the dataset's source
+                version:
+                  type: string
+                  description: no longer than 100 characters
+                state:
+                  type: string
+                  description: "the current state of the dataset, e.g. `'active'` or `'deleted'`, only active datasets show up in search results and other lists of datasets, thsi parameter will be ignored if you are not authorized to change the state of the dataset (default: `'active`')"
+                type:
+                  type: string
+                  description: the type of the dataset, `IDatasetForm` plugins associate themselves with different dataset types and provide custom dataset handling behaviour for these types
+                resources:
+                  type: array
+                  description: the dataset's resources
+                  items:
+                    type: object
+                    properties:
+                      package_id:
+                        type: string
+                        description: id of package that the resource should be added to
+                      url:
+                        type: string
+                        description: url of resource
+                      description:
+                        type: string
+                      format:
+                        type: string
+                      hash:
+                        type: string
+                      name:
+                        type: string
+                      resource_type:
+                        type: string
+                      mimetype:
+                        type: string
+                      mimetype_inner:
+                        type: string
+                      cache_url:
+                        type: string
+                      size:
+                        type: integer
+                      created:
+                        type: string
+                      last_modified:
+                        type: string
+                      cache_last_updated:
+                        type: string
+                      upload:
+                        type: string
+                        format: binary
+                tags:
+                  type: array
+                  description: the dataset's tags
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: "the name for the new tag, a string between 2 and 100 characters long containing only alphanumeric characters, spaces and the characters `-`, `_` and `.`, e.g. `'Jazz'`"
+                      vocabulary_id:
+                        type: string
+                        description: "the id of the vocabulary that the new tag should be added to, e.g. the id of vocabulary `'Genre'`"
+                extras:
+                  type: array
+                  description: "the dataset's extras, extras are arbitrary (key: value) metadata items that can be added to datasets, each extra dictionary should have keys `'key'` (a string), `'value'` (a string)"
+                  items:
+                    type: object
+                    additionalProperties: true
+                plugin_data:
+                  type: object
+                  description: |
+                    Private package data belonging to plugins. Only sysadmin users may set this value. It should be a dict that can be dumped into JSON, and plugins should namespace their data with the plugin name to avoid collisions with other plugins, e.g.:
+
+                    ```json
+                    {
+                        "name": "test-dataset",
+                        "plugin_data": {
+                            "plugin1": {"key1": "value1"},
+                            "plugin2": {"key2": "value2"}
+                        }
+                    }
+                    ```
+                  additionalProperties: true
+                relationships_as_object:
+                  type: array
+                  description: list of relationship dictionaries
+                  items:
+                    type: object
+                    properties:
+                      subject:
+                        type: string
+                        description: the id or name of the dataset that is the subject of the relationship
+                      object:
+                        type: string
+                        description: the id or name of the dataset that is the object of the relationship
+                      type:
+                        type: string
+                        description: "the type of the relationship, one of `'depends_on'`, `'dependency_of'`, `'derives_from'`, `'has_derivation'`, `'links_to'`, `'linked_from'`, `'child_of'` or `'parent_of'`"
+                      comment:
+                        type: string
+                        description: a comment about the relationship
+                relationships_as_subject:
+                  type: array
+                  description: list of relationship dictionaries
+                  items:
+                    type: object
+                    properties:
+                      subject:
+                        type: string
+                        description: the id or name of the dataset that is the subject of the relationship
+                      object:
+                        type: string
+                        description: the id or name of the dataset that is the object of the relationship
+                      type:
+                        type: string
+                        description: "the type of the relationship, one of `'depends_on'`, `'dependency_of'`, `'derives_from'`, `'has_derivation'`, `'links_to'`, `'linked_from'`, `'child_of'` or `'parent_of'`"
+                      comment:
+                        type: string
+                        description: a comment about the relationship
+                groups:
+                  type: array
+                  description: "the groups to which the dataset belongs, each group dictionary should have one or more of the following keys which identify an existing group: `'id'` (the id of the group, string), or `'name'` (the name of the group, string), to see which groups exist call `group_list()`"
+                  items:
+                    type: object
+                    additionalProperties: true
+                owner_org:
+                  type: string
+                  description: "the id of the dataset's owning organization, see `organization_list()` or `organization_list_for_user()` for available values. This parameter can be made optional if the config option [`ckan.auth.create_unowned_dataset`](https://docs.ckan.org/en/2.11/maintaining/configuration.html#ckan-auth-create-unowned-dataset) is set to `True`."
+  resource_patch:
+    patch:
+      operationId: resource_patch
+      summary: resource_patch
+      description: |
+        Patch a resource.
+
+        The difference between the update and patch methods is that the patch will perform an update of the provided parameters, while leaving all other parameters unchanged, whereas the update methods deletes all parameters not explicitly provided in the data_dict.
+      requestBody:
+        required: false
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the id of the resource
+                package_id:
+                  type: string
+                  description: id of package that the resource should be added to
+                url:
+                  type: string
+                  description: url of resource
+                description:
+                  type: string
+                format:
+                  type: string
+                hash:
+                  type: string
+                name:
+                  type: string
+                resource_type:
+                  type: string
+                mimetype:
+                  type: string
+                mimetype_inner:
+                  type: string
+                cache_url:
+                  type: string
+                size:
+                  type: integer
+                created:
+                  type: string
+                last_modified:
+                  type: string
+                cache_last_updated:
+                  type: string
+                upload:
+                  type: string
+                  format: binary
+  group_patch:
+    patch:
+      operationId: group_patch
+      summary: group_patch
+      description: |
+        Patch a group.
+
+        The difference between the update and patch methods is that the patch will perform an update of the provided parameters, while leaving all other parameters unchanged, whereas the update methods deletes all parameters not explicitly provided in the data_dict.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the name or id of the group
+                name:
+                  type: string
+                  description: the name of the group, a string between 2 and 100 characters long, containing only lowercase alphanumeric characters, `-`, and `_`
+                title:
+                  type: string
+                  description: the title of the group
+                description:
+                  type: string
+                  description: the description of the group
+                image_url:
+                  type: string
+                  description: the URL to an image to be displayed on the group's page
+                type:
+                  type: string
+                  description: "the type of the group (default: `'group'`), `IGroupForm` plugins associate themselves with different group types and provide custom group handling behavior for these types cannot be 'organization'"
+                state:
+                  type: string
+                  description: "the current state of the group, e.g. `'active'` or `'deleted'`, only active groups show up in search results and other lists of groups, this parameter will be ignored if you are not authorized to change the state of the group (default: `'active'`)"
+                approval_status:
+                  type: string
+                extras:
+                  type: array
+                  description: "the group's extras, extras are arbitrary (key: value) metadata items that can be added to groups, each extra dictionary should have keys `'key'` (a string), `'value'` (a string), and optionally `'deleted'`"
+                  items:
+                    type: object
+                    additionalProperties: true
+                packages:
+                  type: array
+                  description: "the datasets (packages) that belong to the group, a list of dictionaries each with keys `'name'` (string, the id or name of the dataset) and optionally `'title'` (string, the title of the dataset)"
+                  items:
+                    type: object
+                    additionalProperties: true
+                groups:
+                  type: array
+                  description: "the groups that belong to the group, a list of dictionaries each with key `'name'` (string, the id or name of the group) and optionally `'capacity'` (string, the capacity in which the group is a member of the group)"
+                  items:
+                    type: object
+                    additionalProperties: true
+                users:
+                  type: array
+                  description: "the users that belong to the group, a list of dictionaries each with key `'name'` (string, the id or name of the user) and optionally `'capacity'` (string, the capacity in which the user is a member of the group)"
+                  items:
+                    type: object
+                    additionalProperties: true
+  organization_patch:
+    patch:
+      operationId: organization_patch
+      summary: organization_patch
+      description: |
+        Patch an organization.
+
+        The difference between the update and patch methods is that the patch will perform an update of the provided parameters, while leaving all other parameters unchanged, whereas the update methods deletes all parameters not explicitly provided in the data_dict.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the name or id of the organization
+                name:
+                  type: string
+                  description: the name of the organization, a string between 2 and 100 characters long, containing only lowercase alphanumeric characters, `-`, and `_`
+                title:
+                  type: string
+                  description: the title of the organization
+                description:
+                  type: string
+                  description: the description of the organization
+                image_url:
+                  type: string
+                  description: the URL to an image to be displayed on the organization's page
+                state:
+                  type: string
+                  description: "the current state of the organization, e.g. `'active'` or `'deleted'`, only active organization show up in search results and other lists of organization, this parameter will be ignored if you are not authorized to change the state of the organization (default: `'active'`)"
+                approval_status:
+                  type: string
+                extras:
+                  type: array
+                  description: "the organization's extras, extras are arbitrary (key: value) metadata items that can be added to organization, each extra dictionary should have keys `'key'` (a string), `'value'` (a string), and optionally `'deleted'`"
+                  items:
+                    type: object
+                    additionalProperties: true
+                packages:
+                  type: array
+                  description: "ignored. use `package_owner_org_update()` to change package ownership"
+                  items:
+                    type: object
+                    additionalProperties: true
+                users:
+                  type: array
+                  description: "the users that belong to the organization, a list of dictionaries each with key `'name'` (string, the id or name of the user) and optionally `'capacity'` (string, the capacity in which the user is a member of the organization)"
+                  items:
+                    type: object
+                    additionalProperties: true
+  user_patch:
+    patch:
+      operationId: user_patch
+      summary: user_patch
+      description: |
+        Patch a user.
+
+        The difference between the update and patch methods is that the patch will perform an update of the provided parameters, while leaving all other parameters unchanged, whereas the update methods deletes all parameters not explicitly provided in the data_dict.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: the name or id of the user
+                name:
+                  type: string
+                  description: the name of the new user, a string between 2 and 100 characters long, containing only lowercase alphanumeric characters, `-`, and `_`
+                email:
+                  type: string
+                  description: the email address for the new user
+                password:
+                  type: string
+                  description: the password of the new user, a string of at least 4 characters
+                fullname:
+                  type: string
+                  description: the full name of the new user
+                about:
+                  type: string
+                  description: a description of the new user
+                image_url:
+                  type: string
+                  # Original docs say "group's page" which should be fixed
+                  description: the URL to an image to be displayed on the user's page
+                plugin_extras:
+                  type: object
+                  description: |
+                    private extra user data belonging to plugins. Only sysadmin users may set this value. It should be a dict that can be dumped into JSON, and plugins should namespace their extras with the plugin name to avoid collisions with other plugins, e.g.:
+
+                    ```json
+                    {
+                        "name": "test_user",
+                        "email": "test@example.com",
+                        "plugin_extras": {
+                            "my_plugin": {
+                                "private_extra": 1
+                            },
+                            "another_plugin": {
+                                "another_extra": True
+                            }
+                        }
+                    }
+                    ```
+                  additionalProperties: true
+                with_apitoken:
+                  type: boolean
+                  description: whether to create an API token for the user
   user_delete:
     delete:
       operationId: user_delete
