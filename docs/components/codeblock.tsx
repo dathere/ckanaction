@@ -11,10 +11,10 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { cn } from "../lib/cn";
-import { mergeRefs } from "../lib/merge-refs";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/cn";
+import { mergeRefs } from "@/lib/merge-refs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs.unstyled";
-import { buttonVariants } from "./ui/button";
 
 export interface CodeBlockProps extends ComponentProps<"figure"> {
   /**
@@ -176,7 +176,7 @@ function CopyButton({
         buttonVariants({
           className:
             "hover:text-fd-accent-foreground data-checked:text-fd-accent-foreground",
-          size: "icon-xs",
+          size: "icon",
         }),
         className,
       )}
