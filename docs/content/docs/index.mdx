@@ -2,7 +2,9 @@
 title: ckanaction docs
 ---
 
-ckanaction is a Rust library crate that acts as an API wrapper for the CKAN Actions API (v3).
+import { Highlighter } from "@/components/ui/highlighter"
+
+<Highlighter animationDuration={2000} isView action="box" color="#2596be">ckanaction is a <Highlighter animationDuration={5000} isView action="highlight" color="#2596be">Rust library crate</Highlighter> that acts as an API wrapper for the CKAN Actions API (v3). There is also an <Highlighter animationDuration={5000} isView action="highlight" color="#2596be">interactive web GUI</Highlighter>.</Highlighter>
 
 This means that instead of using generic request library crates such as `reqwest`, a developer can use `ckanaction` instead to make API calls to their CKAN instance.
 
@@ -35,8 +37,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 The source code of ckanaction can be found at [github.com/dathere/ckanaction](https://github.com/ckanaction).
 
-You may also explore this web app to view more code examples for each endpoint and also use an interactive GUI for sending HTTP requests to any local or remote CKAN instance.
+<Highlighter isView action="underline" color="#2596be">You may also explore this web app</Highlighter> to view more code examples for each endpoint and also <Highlighter isView action="underline" color="#2596be">use an interactive GUI</Highlighter> for sending HTTP requests to any local or remote CKAN instance.
 
-View the GIF below to see how to point to a specific CKAN API endpoint using the interactive GUI, which by default points to a local CKAN instance endpoint's URL.
+<Highlighter isView action="underline" color="#2596be">View the GIF below</Highlighter> to see how to point to a specific CKAN API endpoint using the interactive GUI, which by default points to a local CKAN instance endpoint's URL.
 
 ![ckanaction web app demo](/ckanaction-web-app-interactive-demo.gif)
+
+import { GitMergeIcon, MousePointerClickIcon } from 'lucide-react';
+
+<Cards>
+  <Card
+  icon={<MousePointerClickIcon />}
+    href="/docs/status_show"
+    title="Try out an endpoint!"
+  >
+    Explore the web GUI by using the `status_show` CKAN Actions API endpoint.
+  </Card>
+  <Card icon={<GitMergeIcon />} href="https://github.com/dathere/ckanaction" title="Source code">Explore the source code for the Rust library crate and web GUI.</Card>
+</Cards>
