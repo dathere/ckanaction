@@ -1114,15 +1114,15 @@ impl CKAN {
         let mut custom_map: HashMap<String, serde_json::Value> = HashMap::new();
         opsert("groups", groups, &mut map);
         opsert("owner_org", owner_org, &mut map);
-        if let Some(custom) = custom_fields {
-            if custom.is_object() {
-                let custom_temp_map = custom.as_object().unwrap();
-                custom_map.extend(
-                    custom_temp_map
-                        .iter()
-                        .map(|item| (item.0.to_owned(), item.1.to_owned())),
-                );
-            }
+        if let Some(custom) = custom_fields
+            && custom.is_object()
+        {
+            let custom_temp_map = custom.as_object().unwrap();
+            custom_map.extend(
+                custom_temp_map
+                    .iter()
+                    .map(|item| (item.0.to_owned(), item.1.to_owned())),
+            );
         }
         map.extend(
             custom_map
@@ -1660,15 +1660,15 @@ impl CKAN {
         let mut custom_map: HashMap<String, serde_json::Value> = HashMap::new();
         opsert("groups", groups, &mut map);
         opsert("owner_org", owner_org, &mut map);
-        if let Some(custom) = custom_fields {
-            if custom.is_object() {
-                let custom_temp_map = custom.as_object().unwrap();
-                custom_map.extend(
-                    custom_temp_map
-                        .iter()
-                        .map(|item| (item.0.to_owned(), item.1.to_owned())),
-                );
-            }
+        if let Some(custom) = custom_fields
+            && custom.is_object()
+        {
+            let custom_temp_map = custom.as_object().unwrap();
+            custom_map.extend(
+                custom_temp_map
+                    .iter()
+                    .map(|item| (item.0.to_owned(), item.1.to_owned())),
+            );
         }
         map.extend(
             custom_map
@@ -1984,15 +1984,15 @@ impl CKAN {
         let endpoint = self.url.clone() + "/api/3/action/config_option_update";
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         let mut custom_map: HashMap<String, serde_json::Value> = HashMap::new();
-        if let Some(options_obj) = options {
-            if options_obj.is_object() {
-                let custom_temp_map = options_obj.as_object().unwrap();
-                custom_map.extend(
-                    custom_temp_map
-                        .iter()
-                        .map(|item| (item.0.to_owned(), item.1.to_owned())),
-                );
-            }
+        if let Some(options_obj) = options
+            && options_obj.is_object()
+        {
+            let custom_temp_map = options_obj.as_object().unwrap();
+            custom_map.extend(
+                custom_temp_map
+                    .iter()
+                    .map(|item| (item.0.to_owned(), item.1.to_owned())),
+            );
         }
         map.extend(
             custom_map
@@ -2060,15 +2060,15 @@ impl CKAN {
         let mut custom_map: HashMap<String, serde_json::Value> = HashMap::new();
         opsert("groups", groups, &mut map);
         opsert("owner_org", owner_org, &mut map);
-        if let Some(custom) = custom_fields {
-            if custom.is_object() {
-                let custom_temp_map = custom.as_object().unwrap();
-                custom_map.extend(
-                    custom_temp_map
-                        .iter()
-                        .map(|item| (item.0.to_owned(), item.1.to_owned())),
-                );
-            }
+        if let Some(custom) = custom_fields
+            && custom.is_object()
+        {
+            let custom_temp_map = custom.as_object().unwrap();
+            custom_map.extend(
+                custom_temp_map
+                    .iter()
+                    .map(|item| (item.0.to_owned(), item.1.to_owned())),
+            );
         }
         map.extend(
             custom_map
