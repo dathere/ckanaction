@@ -15,6 +15,7 @@ mod tests {
     use super::*;
 
     #[tokio::test]
+    #[ignore = "Set values for const at top of tests file locally."]
     async fn status_show() -> Result<(), Box<dyn std::error::Error>> {
         let ckan = get_ckan_builder().await;
         let response = ckan.status_show().await?;
