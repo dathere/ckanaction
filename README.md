@@ -84,7 +84,7 @@ println!("{status_show:#?}");
 
 ## Tests
 
-To run the tests in the `tests` directory, first replace the values for `CKAN_API_TOKEN` and `CKAN_URL` then run:
+To run some of the tests in the `tests` directory, first replace the values for `CKAN_API_TOKEN` and `CKAN_URL` then run:
 
 ```bash
 cargo test

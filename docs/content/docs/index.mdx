@@ -8,7 +8,7 @@ import { Highlighter } from "@/components/ui/highlighter"
 
 This means that instead of using generic request library crates such as `reqwest`, a developer can use `ckanaction` instead to make API calls to their CKAN instance.
 
-For example the following code can be ran to send an HTTP GET request to the `/package_list` endpoint of a local CKAN instance's API by using the `ckanaction` crate:
+For example the following code can be ran to send an HTTP POST request to the `/package_list` endpoint of a local CKAN instance's API by using the `ckanaction` crate:
 
 ```rust
 use dotenvy::dotenv;
