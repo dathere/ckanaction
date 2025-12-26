@@ -8,6 +8,7 @@ use bon::bon;
 use serde_json::json;
 use std::{collections::HashMap, path::PathBuf};
 
+#[derive(Debug)]
 pub struct CKAN {
     url: String,
     token: Option<String>,
