@@ -4,6 +4,7 @@ version = "0.1.2"
 edition = "2024"
 description = "Rust library crate featuring an API wrapper of the CKAN Action v3 API."
 repository = "https://github.com/dathere/ckanaction"
+homepage = "https://ckanaction.dathere.com"
 license = "Unlicense"
 keywords = ["ckan"]
 categories = ["api-bindings", "asynchronous"]
