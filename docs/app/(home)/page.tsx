@@ -4,7 +4,7 @@
 import { cva } from "class-variance-authority";
 import { CodeBlock } from "fumadocs-ui/components/codeblock";
 import defaultMdxComponents from "fumadocs-ui/mdx";
-import { cn } from "fumadocs-ui/utils/cn";
+import { twMerge as cn } from "tailwind-merge";
 import {
   BlocksIcon,
   GiftIcon,
