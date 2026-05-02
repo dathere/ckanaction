@@ -331,6 +331,17 @@ impl CKAN {
         )
     }
 
+    /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.package_show
+    #[builder]
+    pub async fn package_show(
+        &self,
+        id: String,
+        use_default_schema: Option<bool>,
+        include_plugin_data: Option<bool>,
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+        post!(&self, "package_show", (json id), use_default_schema, include_plugin_data)
+    }
+
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.resource_show
     #[builder]
     pub async fn resource_show(
