@@ -90,3 +90,12 @@ To run some of the tests in the `tests` directory, first replace the values for 
 ```bash
 cargo test
 ```
+
+## Examples
+
+You can run an example from the `examples` directory by first changing into the directory then running `cargo run`. For example:
+
+```bash
+cd examples/status-show
+cargo run
+```
