@@ -345,7 +345,7 @@ impl CKAN {
         id: String,
         use_default_schema: Option<bool>,
         include_plugin_data: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "package_show", (json id), use_default_schema, include_plugin_data)
     }
 
