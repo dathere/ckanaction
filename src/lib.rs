@@ -7,6 +7,15 @@
 use bon::bon;
 use serde_json::json;
 use std::{collections::HashMap, path::PathBuf};
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+#[error(transparent)]
+pub enum CKANError {
+    IoError(#[from] std::io::Error),
+    ReqwestError(#[from] reqwest::Error),
+    SerdeJsonError(#[from] serde_json::Error),
+}
 
 #[derive(Debug)]
 pub struct CKAN {
@@ -14,9 +23,7 @@ pub struct CKAN {
     token: Option<String>,
 }
 
-fn hashmap_to_json(
-    map: &HashMap<&str, serde_json::Value>,
-) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+fn hashmap_to_json(map: &HashMap<&str, serde_json::Value>) -> Result<serde_json::Value, CKANError> {
     Ok(serde_json::from_str(serde_json::to_string(&map)?.as_str())?)
 }
 
@@ -79,7 +86,7 @@ impl CKAN {
         }
     }
 
-    async fn get(&self, endpoint: String) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    async fn get(&self, endpoint: String) -> Result<serde_json::Value, CKANError> {
         let client = reqwest::Client::new();
         let mut req_builder = client.get(endpoint);
         if self.token.is_some() {
@@ -98,7 +105,7 @@ impl CKAN {
         endpoint: String,
         body: Option<serde_json::Value>,
         upload: Option<PathBuf>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         let client = reqwest::Client::new();
         let mut req_builder = client.post(endpoint);
         if self.token.is_some() {
@@ -127,7 +134,7 @@ impl CKAN {
         &self,
         limit: Option<u32>,
         offset: Option<u32>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "package_list", limit, offset)
     }
 
@@ -138,7 +145,7 @@ impl CKAN {
         limit: Option<u32>,
         offset: Option<u32>,
         page: Option<u32>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(
             &self,
             "current_package_list_with_resources",
@@ -155,7 +162,7 @@ impl CKAN {
         id: String,
         object_type: Option<String>,
         capacity: Option<String>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "member_list", (json id), object_type, capacity)
     }
 
@@ -165,7 +172,7 @@ impl CKAN {
         &self,
         id: String,
         capacity: Option<String>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "package_collaborator_list", (json id), capacity)
     }
 
@@ -175,7 +182,7 @@ impl CKAN {
         &self,
         id: String,
         capacity: Option<String>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "package_collaborator_list_for_user", (json id), capacity)
     }
 
@@ -195,7 +202,7 @@ impl CKAN {
         include_tags: Option<bool>,
         include_groups: Option<bool>,
         include_users: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(
             &self,
             "group_list",
@@ -230,7 +237,7 @@ impl CKAN {
         include_tags: Option<bool>,
         include_groups: Option<bool>,
         include_users: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(
             &self,
             "organization_list",
@@ -255,7 +262,7 @@ impl CKAN {
         &self,
         available_only: Option<bool>,
         am_member: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "group_list_authz", available_only, am_member)
     }
 
@@ -266,7 +273,7 @@ impl CKAN {
         id: Option<String>,
         permission: Option<String>,
         include_dataset_count: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(
             &self,
             "organization_list_for_user",
@@ -278,7 +285,7 @@ impl CKAN {
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.license_list
     #[builder]
-    pub async fn license_list(&self) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn license_list(&self) -> Result<serde_json::Value, CKANError> {
         post!(&self, "license_list")
     }
 
@@ -289,7 +296,7 @@ impl CKAN {
         query: Option<String>,
         vocabulary_id: Option<String>,
         all_fields: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "tag_list", query, vocabulary_id, all_fields)
     }
 
@@ -302,7 +309,7 @@ impl CKAN {
         order_by: Option<String>,
         all_fields: Option<bool>,
         include_site_user: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(
             &self,
             "user_list",
@@ -321,7 +328,7 @@ impl CKAN {
         id: String,
         id2: String,
         rel: Option<String>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(
             &self,
             "package_relationships_list",
@@ -344,28 +351,19 @@ impl CKAN {
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.resource_show
     #[builder]
-    pub async fn resource_show(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn resource_show(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "resource_show", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.resource_view_show
     #[builder]
-    pub async fn resource_view_show(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn resource_view_show(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "resource_view_show", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.resource_view_list
     #[builder]
-    pub async fn resource_view_list(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn resource_view_list(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "resource_view_list", (json id))
     }
 
@@ -381,7 +379,7 @@ impl CKAN {
         include_groups: Option<bool>,
         include_tags: Option<bool>,
         include_followers: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(
             &self,
             "group_show",
@@ -408,7 +406,7 @@ impl CKAN {
         include_groups: Option<bool>,
         include_tags: Option<bool>,
         include_followers: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(
             &self,
             "organization_show",
@@ -429,7 +427,7 @@ impl CKAN {
         &self,
         id: String,
         limit: Option<i32>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "group_package_show", (json id), limit)
     }
 
@@ -440,7 +438,7 @@ impl CKAN {
         id: String,
         vocabulary_id: Option<String>,
         include_datasets: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "tag_show", (json id), vocabulary_id, include_datasets)
     }
 
@@ -453,7 +451,7 @@ impl CKAN {
         include_num_followers: Option<bool>,
         include_password_hash: Option<bool>,
         include_plugin_extras: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(
             &self,
             "user_show",
@@ -471,7 +469,7 @@ impl CKAN {
         &self,
         q: String,
         limit: Option<i32>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "package_autocomplete", (json q), limit)
     }
 
@@ -481,7 +479,7 @@ impl CKAN {
         &self,
         q: String,
         limit: Option<i32>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "format_autocomplete", (json q), limit)
     }
 
@@ -491,7 +489,7 @@ impl CKAN {
         &self,
         q: String,
         limit: Option<i32>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "user_autocomplete", (json q), limit)
     }
 
@@ -501,7 +499,7 @@ impl CKAN {
         &self,
         q: String,
         limit: Option<i32>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "group_autocomplete", (json q), limit)
     }
 
@@ -511,7 +509,7 @@ impl CKAN {
         &self,
         q: String,
         limit: Option<i32>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "organization_autocomplete", (json q), limit)
     }
 
@@ -532,7 +530,7 @@ impl CKAN {
         include_drafts: Option<bool>,
         include_private: Option<bool>,
         use_default_schema: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(
             &self,
             "package_search",
@@ -560,7 +558,7 @@ impl CKAN {
         order_by: Option<String>,
         offset: Option<i32>,
         limit: Option<i32>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "resource_search", query, order_by, offset, limit)
     }
 
@@ -572,7 +570,7 @@ impl CKAN {
         vocabulary_id: Option<String>,
         limit: Option<i32>,
         offset: Option<i32>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "tag_search", query, vocabulary_id, limit, offset)
     }
 
@@ -584,7 +582,7 @@ impl CKAN {
         vocabulary_id: Option<String>,
         limit: Option<i32>,
         offset: Option<i32>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(
             &self,
             "tag_autocomplete",
@@ -603,7 +601,7 @@ impl CKAN {
         entity_id: Option<String>,
         task_type: Option<String>,
         key: Option<String>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "task_status_show", id, entity_id, task_type, key)
     }
 
@@ -613,7 +611,7 @@ impl CKAN {
         &self,
         terms: Option<Vec<String>>,
         lang_codes: Option<Vec<String>>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "term_translation_show", terms, lang_codes)
     }
 
@@ -622,55 +620,43 @@ impl CKAN {
     pub async fn get_site_user(
         &self,
         defer_commit: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "get_site_user", defer_commit)
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.status_show
-    pub async fn status_show(&self) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn status_show(&self) -> Result<serde_json::Value, CKANError> {
         let endpoint = self.url.clone() + "/api/3/action/status_show";
         Self::get(self, endpoint).await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.vocabulary_list
-    pub async fn vocabulary_list(&self) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn vocabulary_list(&self) -> Result<serde_json::Value, CKANError> {
         let endpoint = self.url.clone() + "/api/3/action/vocabulary_list";
         Self::get(self, endpoint).await
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.vocabulary_show
     #[builder]
-    pub async fn vocabulary_show(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn vocabulary_show(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "vocabulary_show", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.user_follower_count
     #[builder]
-    pub async fn user_follower_count(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn user_follower_count(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "user_follower_count", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.dataset_follower_count
     #[builder]
-    pub async fn dataset_follower_count(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn dataset_follower_count(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "dataset_follower_count", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.group_follower_count
     #[builder]
-    pub async fn group_follower_count(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn group_follower_count(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "group_follower_count", (json id))
     }
 
@@ -679,97 +665,67 @@ impl CKAN {
     pub async fn organization_follower_count(
         &self,
         id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "organization_follower_count", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.user_follower_list
     #[builder]
-    pub async fn user_follower_list(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn user_follower_list(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "user_follower_list", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.dataset_follower_list
     #[builder]
-    pub async fn dataset_follower_list(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn dataset_follower_list(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "dataset_follower_list", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.group_follower_list
     #[builder]
-    pub async fn group_follower_list(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn group_follower_list(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "group_follower_list", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.am_following_user
     #[builder]
-    pub async fn am_following_user(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn am_following_user(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "am_following_user", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.am_following_dataset
     #[builder]
-    pub async fn am_following_dataset(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn am_following_dataset(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "am_following_dataset", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.am_following_group
     #[builder]
-    pub async fn am_following_group(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn am_following_group(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "am_following_group", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.followee_count
     #[builder]
-    pub async fn followee_count(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn followee_count(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "followee_count", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.user_followee_count
     #[builder]
-    pub async fn user_followee_count(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn user_followee_count(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "user_followee_count", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.dataset_followee_count
     #[builder]
-    pub async fn dataset_followee_count(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn dataset_followee_count(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "dataset_followee_count", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.group_followee_count
     #[builder]
-    pub async fn group_followee_count(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn group_followee_count(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "group_followee_count", (json id))
     }
 
@@ -778,7 +734,7 @@ impl CKAN {
     pub async fn organization_followee_count(
         &self,
         id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "organization_followee_count", (json id))
     }
 
@@ -788,34 +744,25 @@ impl CKAN {
         &self,
         id: String,
         q: Option<String>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "followee_list", (json id), q)
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.user_followee_list
     #[builder]
-    pub async fn user_followee_list(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn user_followee_list(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "user_followee_list", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.dataset_followee_list
     #[builder]
-    pub async fn dataset_followee_list(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn dataset_followee_list(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "dataset_followee_list", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.group_followee_list
     #[builder]
-    pub async fn group_followee_list(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn group_followee_list(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "group_followee_list", (json id))
     }
 
@@ -824,7 +771,7 @@ impl CKAN {
     pub async fn organization_followee_list(
         &self,
         id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "organization_followee_list", (json id))
     }
 
@@ -833,32 +780,24 @@ impl CKAN {
     pub async fn member_roles_list(
         &self,
         group_type: Option<String>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "member_roles_list", group_type)
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.help_show
     #[builder]
-    pub async fn help_show(
-        &self,
-        name: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn help_show(&self, name: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "help_show", (json name))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.config_option_show
     #[builder]
-    pub async fn config_option_show(
-        &self,
-        key: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn config_option_show(&self, key: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "config_option_show", (json key))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.config_option_list
-    pub async fn config_option_list(
-        &self,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn config_option_list(&self) -> Result<serde_json::Value, CKANError> {
         let endpoint = self.url.clone() + "/api/3/action/config_option_list";
         Self::get(self, endpoint).await
     }
@@ -868,25 +807,19 @@ impl CKAN {
     pub async fn job_list(
         &self,
         queues: Option<Vec<String>>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "job_list", queues)
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.job_show
     #[builder]
-    pub async fn job_show(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn job_show(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "job_show", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.get.api_token_list
     #[builder]
-    pub async fn api_token_list(
-        &self,
-        user_id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn api_token_list(&self, user_id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "api_token_list", (json user_id))
     }
 
@@ -916,7 +849,7 @@ impl CKAN {
         groups: Option<Vec<serde_json::Value>>,
         owner_org: Option<String>,
         custom_fields: Option<serde_json::Value>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         let endpoint = self.url.clone() + "/api/3/action/package_create";
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         opsert!(&mut map, (json name), title, (json private), author, author_email, maintainer, maintainer_email, license_id, notes, url, version, state, ("type", _type), resources, tags, extras, plugin_data, relationships_as_object, relationships_as_subject, groups, owner_org);
@@ -959,7 +892,7 @@ impl CKAN {
         last_modified: Option<String>,
         cache_last_updated: Option<String>,
         upload: Option<PathBuf>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "resource_create", (json package_id), url, description, format, hash, name, resource_type, mimetype, mimetype_inner, cache_url, size, created, last_modified, cache_last_updated; (upload upload))
     }
 
@@ -972,7 +905,7 @@ impl CKAN {
         description: Option<String>,
         view_type: String,
         config: Option<String>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "resource_view_create", (json resource_id), (json title), description, (json view_type), config)
     }
 
@@ -983,7 +916,7 @@ impl CKAN {
         resource: serde_json::Value,
         package: Option<serde_json::Value>,
         create_datastore_views: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "create_default_resource_views", (exact resource), package, create_datastore_views)
     }
 
@@ -993,7 +926,7 @@ impl CKAN {
         &self,
         package: serde_json::Value,
         create_datastore_views: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "package_create_default_resource_views", (exact package), create_datastore_views)
     }
 
@@ -1005,7 +938,7 @@ impl CKAN {
         object: String,
         _type: String,
         comment: Option<String>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "package_relationship_create", (json subject), (json object), ("type", json!(_type)), comment)
     }
 
@@ -1017,7 +950,7 @@ impl CKAN {
         object: String,
         object_type: String,
         capacity: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "member_create", (json id), (json object), (json object_type), (json capacity))
     }
 
@@ -1028,7 +961,7 @@ impl CKAN {
         id: String,
         user_id: String,
         capacity: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "package_collaborator_create", (json id), (json user_id), (json capacity))
     }
 
@@ -1048,7 +981,7 @@ impl CKAN {
         packages: Option<Vec<serde_json::Value>>,
         groups: Option<Vec<serde_json::Value>>,
         users: Option<Vec<serde_json::Value>>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "group_create", (json name), id, title, description, image_url, ("type", _type), state, approval_status, extras, packages, groups, users)
     }
 
@@ -1066,7 +999,7 @@ impl CKAN {
         extras: Option<Vec<serde_json::Value>>,
         packages: Option<Vec<serde_json::Value>>,
         users: Option<Vec<serde_json::Value>>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "organization_create", (json name), id, title, description, image_url, state, approval_status, extras, packages, users)
     }
 
@@ -1083,7 +1016,7 @@ impl CKAN {
         image_url: Option<String>,
         plugin_extras: Option<serde_json::Value>,
         with_apitoken: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "user_create", (json name), (json email), (json password), id, fullname, about, image_url, plugin_extras, with_apitoken)
     }
 
@@ -1094,7 +1027,7 @@ impl CKAN {
         email: String,
         group_id: String,
         role: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "user_invite", (json email), (json group_id), (json role))
     }
 
@@ -1104,7 +1037,7 @@ impl CKAN {
         &self,
         name: String,
         tags: Vec<serde_json::Value>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "vocabulary_create", (json name), (json tags))
     }
 
@@ -1114,25 +1047,19 @@ impl CKAN {
         &self,
         name: String,
         vocabulary_id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "tag_create", (json name), (json vocabulary_id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.follow_user
     #[builder]
-    pub async fn follow_user(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn follow_user(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "follow_user", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.follow_dataset
     #[builder]
-    pub async fn follow_dataset(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn follow_dataset(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "follow_dataset", (json id))
     }
 
@@ -1143,7 +1070,7 @@ impl CKAN {
         id: String,
         username: String,
         role: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "group_member_create", (json id), (json username), (json role))
     }
 
@@ -1154,16 +1081,13 @@ impl CKAN {
         id: String,
         username: String,
         role: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "organization_member_create", (json id), (json username), (json role))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.create.follow_group
     #[builder]
-    pub async fn follow_group(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn follow_group(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "follow_group", (json id))
     }
 
@@ -1173,7 +1097,7 @@ impl CKAN {
         &self,
         user: String,
         name: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "api_token_create", (json user), (json name))
     }
 
@@ -1197,7 +1121,7 @@ impl CKAN {
         last_modified: Option<String>,
         cache_last_updated: Option<String>,
         upload: Option<PathBuf>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "resource_update", (json id), (json package_id), url, description, format, hash, name, resource_type, mimetype, mimetype_inner, cache_url, size, created, last_modified, cache_last_updated; (upload upload))
     }
 
@@ -1211,7 +1135,7 @@ impl CKAN {
         description: Option<String>,
         view_type: String,
         config: Option<String>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "resource_view_update", (json id), (json resource_id), (json title), description, (json view_type), config)
     }
 
@@ -1221,7 +1145,7 @@ impl CKAN {
         &self,
         id: String,
         order: Vec<String>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "resource_view_reorder", (json id), (json order))
     }
 
@@ -1252,7 +1176,7 @@ impl CKAN {
         groups: Option<Vec<serde_json::Value>>,
         owner_org: Option<String>,
         custom_fields: Option<serde_json::Value>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         let endpoint = self.url.clone() + "/api/3/action/package_update";
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         opsert!(&mut map, (json id), (json name), title, (json private), author, author_email, maintainer, maintainer_email, license_id, notes, url, version, state, ("type", _type), resources, tags, extras, plugin_data, relationships_as_object, relationships_as_subject, groups, owner_org);
@@ -1284,7 +1208,7 @@ impl CKAN {
         filter: Option<Vec<String>>,
         update: serde_json::Value,
         include: Option<Vec<String>>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "package_revise", ("match", _match), filter, (exact update), include)
     }
 
@@ -1294,7 +1218,7 @@ impl CKAN {
         &self,
         id: String,
         order: Vec<String>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "package_resource_reorder", (json id), (json order))
     }
 
@@ -1306,7 +1230,7 @@ impl CKAN {
         object: String,
         _type: String,
         comment: Option<String>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "package_relationship_update", (json subject), (json object), ("type", json!(_type)), comment)
     }
 
@@ -1326,7 +1250,7 @@ impl CKAN {
         packages: Option<Vec<serde_json::Value>>,
         groups: Option<Vec<serde_json::Value>>,
         users: Option<Vec<serde_json::Value>>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "group_update", (json id), (json name), title, description, image_url, ("type", _type), state, approval_status, extras, packages, groups, users)
     }
 
@@ -1343,7 +1267,7 @@ impl CKAN {
         approval_status: Option<String>,
         extras: Option<Vec<serde_json::Value>>,
         users: Option<Vec<serde_json::Value>>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "organization_update", (json id), (json name), title, description, image_url, state, approval_status, extras, users)
     }
 
@@ -1360,7 +1284,7 @@ impl CKAN {
         image_url: Option<String>,
         plugin_extras: Option<serde_json::Value>,
         with_apitoken: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "user_update", (json id), (json name), (json email), (json password), fullname, about, image_url, plugin_extras, with_apitoken)
     }
 
@@ -1377,7 +1301,7 @@ impl CKAN {
         state: Option<String>,
         last_updated: Option<String>,
         error: Option<String>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "task_status_update", (json id), (json entity_id), (json entity_type), (json task_type), (json key), value, state, last_updated, error)
     }
 
@@ -1386,7 +1310,7 @@ impl CKAN {
     pub async fn task_status_update_many(
         &self,
         data: Vec<serde_json::Value>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "task_status_update_many", (json data))
     }
 
@@ -1397,7 +1321,7 @@ impl CKAN {
         term: String,
         term_translation: String,
         lang_code: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "term_translation_update", (json term), (json term_translation), (json lang_code))
     }
 
@@ -1406,7 +1330,7 @@ impl CKAN {
     pub async fn term_translation_update_many(
         &self,
         data: Vec<serde_json::Value>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "term_translation_update_many", (json data))
     }
 
@@ -1417,7 +1341,7 @@ impl CKAN {
         id: String,
         name: String,
         tags: Vec<serde_json::Value>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "vocabulary_update", (json id), (json name), (json tags))
     }
 
@@ -1427,7 +1351,7 @@ impl CKAN {
         &self,
         id: String,
         organization_id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "package_owner_org_update", (json id), (json organization_id))
     }
 
@@ -1437,7 +1361,7 @@ impl CKAN {
         &self,
         datasets: Vec<String>,
         org_id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "bulk_update_private", (json datasets), (json org_id))
     }
 
@@ -1447,7 +1371,7 @@ impl CKAN {
         &self,
         datasets: Vec<String>,
         org_id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "bulk_update_public", (json datasets), (json org_id))
     }
 
@@ -1457,7 +1381,7 @@ impl CKAN {
         &self,
         datasets: Vec<String>,
         org_id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "bulk_update_delete", (json datasets), (json org_id))
     }
 
@@ -1467,7 +1391,7 @@ impl CKAN {
     pub async fn config_option_update(
         &self,
         options: Option<serde_json::Value>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         let endpoint = self.url.clone() + "/api/3/action/config_option_update";
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         let mut custom_map: HashMap<String, serde_json::Value> = HashMap::new();
@@ -1517,7 +1441,7 @@ impl CKAN {
         groups: Option<Vec<serde_json::Value>>,
         owner_org: Option<String>,
         custom_fields: Option<serde_json::Value>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         let endpoint = self.url.clone() + "/api/3/action/package_patch";
         let mut map: HashMap<&str, serde_json::Value> = HashMap::new();
         opsert!(&mut map, (json id), (json name), title, (json private), author, author_email, maintainer, maintainer_email, license_id, notes, url, version, state, ("type", _type), resources, tags, extras, plugin_data, relationships_as_object, relationships_as_subject, groups, owner_org);
@@ -1561,7 +1485,7 @@ impl CKAN {
         last_modified: Option<String>,
         cache_last_updated: Option<String>,
         upload: Option<PathBuf>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "resource_patch", (json id), (json package_id), url, description, format, hash, name, resource_type, mimetype, mimetype_inner, cache_url, size, created, last_modified, cache_last_updated; (upload upload))
     }
 
@@ -1581,7 +1505,7 @@ impl CKAN {
         packages: Option<Vec<serde_json::Value>>,
         groups: Option<Vec<serde_json::Value>>,
         users: Option<Vec<serde_json::Value>>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "group_patch", (json id), (json name), title, description, image_url, ("type", _type), state, approval_status, extras, packages, groups, users)
     }
 
@@ -1598,7 +1522,7 @@ impl CKAN {
         approval_status: Option<String>,
         extras: Option<Vec<serde_json::Value>>,
         users: Option<Vec<serde_json::Value>>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "organization_patch", (json id), (json name), title, description, image_url, state, approval_status, extras, users)
     }
 
@@ -1615,52 +1539,37 @@ impl CKAN {
         image_url: Option<String>,
         plugin_extras: Option<serde_json::Value>,
         with_apitoken: Option<bool>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "user_patch", (json id), (json name), (json email), (json password), fullname, about, image_url, plugin_extras, with_apitoken)
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.user_delete
     #[builder]
-    pub async fn user_delete(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn user_delete(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "user_delete", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.package_delete
     #[builder]
-    pub async fn package_delete(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn package_delete(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "package_delete", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.dataset_purge
     #[builder]
-    pub async fn dataset_purge(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn dataset_purge(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "dataset_purge", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.resource_delete
     #[builder]
-    pub async fn resource_delete(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn resource_delete(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "resource_delete", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.resource_view_delete
     #[builder]
-    pub async fn resource_view_delete(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn resource_view_delete(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "resource_view_delete", (json id))
     }
 
@@ -1669,7 +1578,7 @@ impl CKAN {
     pub async fn resource_view_clear(
         &self,
         view_types: Option<Vec<String>>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "resource_view_clear", view_types)
     }
 
@@ -1680,7 +1589,7 @@ impl CKAN {
         subject: String,
         object: String,
         _type: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "package_relationship_delete", (json subject), (json object), ("type", json!(_type)))
     }
 
@@ -1691,7 +1600,7 @@ impl CKAN {
         id: String,
         object: String,
         object_type: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "member_delete", (json id), (json object), (json object_type))
     }
 
@@ -1701,61 +1610,43 @@ impl CKAN {
         &self,
         id: String,
         user_id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "package_collaborator_delete", (json id), (json user_id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.group_delete
     #[builder]
-    pub async fn group_delete(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn group_delete(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "group_delete", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.organization_delete
     #[builder]
-    pub async fn organization_delete(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn organization_delete(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "organization_delete", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.group_purge
     #[builder]
-    pub async fn group_purge(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn group_purge(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "group_purge", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.organization_purge
     #[builder]
-    pub async fn organization_purge(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn organization_purge(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "organization_purge", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.task_status_delete
     #[builder]
-    pub async fn task_status_delete(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn task_status_delete(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "task_status_delete", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.vocabulary_delete
     #[builder]
-    pub async fn vocabulary_delete(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn vocabulary_delete(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "vocabulary_delete", (json id))
     }
 
@@ -1765,25 +1656,19 @@ impl CKAN {
         &self,
         id: String,
         vocabulary_id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "tag_delete", (json id), (json vocabulary_id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.unfollow_user
     #[builder]
-    pub async fn unfollow_user(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn unfollow_user(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "unfollow_user", (json id))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.unfollow_dataset
     #[builder]
-    pub async fn unfollow_dataset(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn unfollow_dataset(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "unfollow_dataset", (json id))
     }
 
@@ -1793,7 +1678,7 @@ impl CKAN {
         &self,
         id: String,
         username: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "group_member_delete", (json id), (json username))
     }
 
@@ -1803,16 +1688,13 @@ impl CKAN {
         &self,
         id: String,
         username: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "organization_member_delete", (json id), (json username))
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.unfollow_group
     #[builder]
-    pub async fn unfollow_group(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn unfollow_group(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "unfollow_group", (json id))
     }
 
@@ -1821,16 +1703,13 @@ impl CKAN {
     pub async fn job_clear(
         &self,
         queues: Option<Vec<String>>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "job_clear", queues)
     }
 
     /// https://docs.ckan.org/en/2.11/api/index.html#ckan.logic.action.delete.job_cancel
     #[builder]
-    pub async fn job_cancel(
-        &self,
-        id: String,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn job_cancel(&self, id: String) -> Result<serde_json::Value, CKANError> {
         post!(&self, "job_cancel", (json id))
     }
 
@@ -1840,7 +1719,7 @@ impl CKAN {
         &self,
         token: String,
         jti: Option<String>,
-    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "api_token_revoke", (json token), jti)
     }
 }
