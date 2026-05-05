@@ -1,6 +1,7 @@
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+use ckanaction::CKANError;
 
+#[tokio::main]
+async fn main() -> Result<(), CKANError> {
     // Initialize and build CKAN struct
     let ckan = ckanaction::CKAN::builder()
         .url("http://localhost:5000")

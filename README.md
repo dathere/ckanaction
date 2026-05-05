@@ -13,10 +13,11 @@ cargo add ckanaction
 Run `/package_list` endpoint with a limit of 5 results per page and print the output:
 
 ```rust
+use ckanaction::CKANError;
 use dotenvy::dotenv;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), CKANError> {
     // Load environment variables from .env file
     dotenv()?;
 

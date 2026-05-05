@@ -1,4 +1,4 @@
-use ckanaction::CKAN;
+use ckanaction::{CKAN, CKANError};
 
 const CKAN_API_TOKEN: &str = "";
 const CKAN_URL: &str = "";
@@ -12,7 +12,7 @@ pub async fn get_ckan_builder() -> CKAN {
 
 #[tokio::test]
 #[ignore = "Set values for const at top of tests file locally."]
-async fn status_show() -> Result<(), Box<dyn std::error::Error>> {
+async fn status_show() -> Result<(), CKANError> {
     let ckan = get_ckan_builder().await;
     let response = ckan.status_show().await?;
     assert!(response.is_object());
@@ -28,7 +28,7 @@ async fn status_show() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[tokio::test]
-async fn print_ckan_struct_with_debug() -> Result<(), Box<dyn std::error::Error>> {
+async fn print_ckan_struct_with_debug() -> Result<(), CKANError> {
     let ckan = get_ckan_builder().await;
     assert_eq!(format!("{ckan:?}"), r#"CKAN { url: "", token: Some("") }"#);
     Ok(())

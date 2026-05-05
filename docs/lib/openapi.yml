@@ -48,10 +48,11 @@ paths:
         - lang: rust
           label: Rust SDK (ckanaction) example
           source: |
+            use ckanaction::CKANError;
             use dotenvy::dotenv;
 
             #[tokio::main]
-            async fn main() -> Result<(), Box<dyn std::error::Error>> {
+            async fn main() -> Result<(), CKANError> {
                 // Load environment variables from .env file
                 dotenv()?;
 
@@ -420,10 +421,11 @@ paths:
         - lang: rust
           label: Rust SDK (ckanaction) example
           source: |
+            use ckanaction::CKANError;
             use dotenvy::dotenv;
 
             #[tokio::main]
-            async fn main() -> Result<(), Box<dyn std::error::Error>> {
+            async fn main() -> Result<(), CKANError> {
                 // Load environment variables from .env file
                 dotenv()?;
 
@@ -814,10 +816,11 @@ paths:
         - lang: rust
           label: Rust SDK (ckanaction) example
           source: |
+            use ckanaction::CKANError;
             use dotenvy::dotenv;
 
             #[tokio::main]
-            async fn main() -> Result<(), Box<dyn std::error::Error>> {
+            async fn main() -> Result<(), CKANError> {
                 // Load environment variables from .env file
                 dotenv()?;
 
@@ -1024,10 +1027,11 @@ paths:
           - lang: rust
             label: Rust SDK (ckanaction) example
             source: |
+              use ckanaction::CKANError;
               use dotenvy::dotenv;
 
               #[tokio::main]
-              async fn main() -> Result<(), Box<dyn std::error::Error>> {
+              async fn main() -> Result<(), CKANError> {
                   // Load environment variables from .env file
                   dotenv()?;
 
