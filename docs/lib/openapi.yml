@@ -30,7 +30,7 @@ paths:
     post:
       operationId: package_list
       summary: package_list
-      description: This endpoint lists CKAN resources.
+      description: Return a list of the name of the site's datasets (packages).
       requestBody:
         required: false
         content:
