@@ -99,6 +99,16 @@ impl CKAN {
             .await?)
     }
 
+    #[cfg(feature = "full_response")]
+    async fn get(&self, endpoint: String) -> Result<reqwest::Response, CKANError> {
+        let client = reqwest::Client::new();
+        let mut req_builder = client.get(endpoint);
+        if self.token.is_some() {
+            req_builder = req_builder.header("Authorization", self.token.clone().unwrap());
+        }
+        Ok(req_builder.send().await?)
+    }
+
     #[builder]
     async fn post(
         &self,
@@ -124,6 +134,36 @@ impl CKAN {
             Ok(res)
         } else {
             let res = req_builder.json(&body).send().await?.json().await?;
+            Ok(res)
+        }
+    }
+
+    #[cfg(feature = "full_response")]
+    #[builder]
+    async fn post(
+        &self,
+        endpoint: String,
+        body: Option<serde_json::Value>,
+        upload: Option<PathBuf>,
+    ) -> Result<reqwest::Response, CKANError> {
+        let client = reqwest::Client::new();
+        let mut req_builder = client.post(endpoint);
+        if self.token.is_some() {
+            req_builder = req_builder.header("Authorization", self.token.clone().unwrap());
+        }
+        if let Some(file_pathbuf) = upload {
+            let mut form = reqwest::multipart::Form::new();
+            if let Some(body_as_value) = body {
+                for entry in body_as_value.as_object().unwrap().iter() {
+                    form = form.text(entry.0.to_owned(), entry.1.as_str().unwrap().to_owned());
+                }
+            }
+            form = form.file("upload", file_pathbuf).await?;
+            req_builder = req_builder.multipart(form);
+            let res = req_builder.send().await?;
+            Ok(res)
+        } else {
+            let res = req_builder.json(&body).send().await?;
             Ok(res)
         }
     }
