@@ -19,6 +19,3 @@ thiserror = "2.0.18"
 
 [dev-dependencies]
 tokio = { version = "1.52.3", features = ["full"] }
-
-[features]
-full_response = []

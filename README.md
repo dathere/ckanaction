@@ -6,12 +6,6 @@ Rust library crate to access [CKAN](https://ckan.org) Action API endpoints throu
 cargo add ckanaction
 ```
 
-If you want to return the full [`reqwest::Response`](https://docs.rs/reqwest/latest/reqwest/struct.Response.html) instead of attempting to deserialize the response to JSON by default (e.g. erroneous response such as a Cloudflare firewall), include the `full_response` feature flag so you can add error handling in your code:
-
-```bash
-cargo add ckanaction -F full_response
-```
-
 ![ckanaction IDE hints demo](https://github.com/user-attachments/assets/515d5742-4a33-43b9-9f3f-4795d18579c0)
 
 ## Examples

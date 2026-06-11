@@ -21,6 +21,7 @@ pub enum CKANError {
 pub struct CKAN {
     url: String,
     token: Option<String>,
+    headers: Option<HashMap<String, String>>,
 }
 
 fn hashmap_to_json(map: &HashMap<&str, serde_json::Value>) -> Result<serde_json::Value, CKANError> {
@@ -79,10 +80,11 @@ macro_rules! post {
 #[bon]
 impl CKAN {
     #[builder]
-    pub fn new(url: &str, token: Option<String>) -> Self {
+    pub fn new(url: &str, token: Option<String>, headers: Option<HashMap<String, String>>) -> Self {
         Self {
             url: url.to_string(),
             token,
+            headers,
         }
     }
 
@@ -92,21 +94,16 @@ impl CKAN {
         if self.token.is_some() {
             req_builder = req_builder.header("Authorization", self.token.clone().unwrap());
         }
+        if let Some(headers) = &self.headers {
+            for (name, value) in headers {
+                req_builder = req_builder.header(name, value);
+            }
+        }
         Ok(req_builder
             .send()
             .await?
             .json::<serde_json::Value>()
             .await?)
-    }
-
-    #[cfg(feature = "full_response")]
-    async fn get(&self, endpoint: String) -> Result<reqwest::Response, CKANError> {
-        let client = reqwest::Client::new();
-        let mut req_builder = client.get(endpoint);
-        if self.token.is_some() {
-            req_builder = req_builder.header("Authorization", self.token.clone().unwrap());
-        }
-        Ok(req_builder.send().await?)
     }
 
     #[builder]
@@ -121,35 +118,10 @@ impl CKAN {
         if self.token.is_some() {
             req_builder = req_builder.header("Authorization", self.token.clone().unwrap());
         }
-        if let Some(file_pathbuf) = upload {
-            let mut form = reqwest::multipart::Form::new();
-            if let Some(body_as_value) = body {
-                for entry in body_as_value.as_object().unwrap().iter() {
-                    form = form.text(entry.0.to_owned(), entry.1.as_str().unwrap().to_owned());
-                }
+        if let Some(headers) = &self.headers {
+            for (name, value) in headers {
+                req_builder = req_builder.header(name, value);
             }
-            form = form.file("upload", file_pathbuf).await?;
-            req_builder = req_builder.multipart(form);
-            let res = req_builder.send().await?.json().await?;
-            Ok(res)
-        } else {
-            let res = req_builder.json(&body).send().await?.json().await?;
-            Ok(res)
-        }
-    }
-
-    #[cfg(feature = "full_response")]
-    #[builder]
-    async fn post(
-        &self,
-        endpoint: String,
-        body: Option<serde_json::Value>,
-        upload: Option<PathBuf>,
-    ) -> Result<reqwest::Response, CKANError> {
-        let client = reqwest::Client::new();
-        let mut req_builder = client.post(endpoint);
-        if self.token.is_some() {
-            req_builder = req_builder.header("Authorization", self.token.clone().unwrap());
         }
         if let Some(file_pathbuf) = upload {
             let mut form = reqwest::multipart::Form::new();
@@ -160,11 +132,9 @@ impl CKAN {
             }
             form = form.file("upload", file_pathbuf).await?;
             req_builder = req_builder.multipart(form);
-            let res = req_builder.send().await?;
-            Ok(res)
+            Ok(req_builder.send().await?.json().await?)
         } else {
-            let res = req_builder.json(&body).send().await?;
-            Ok(res)
+            Ok(req_builder.json(&body).send().await?.json().await?)
         }
     }
 
