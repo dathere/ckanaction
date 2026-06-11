@@ -1,0 +1,8 @@
+allowBuilds:
+  esbuild: true
+  sharp: true
+minimumReleaseAgeExclude:
+  - '@fuma-translate/react@1.0.1'
+  - '@fumadocs/api-docs@0.0.2'
+  - fumadocs-core@16.10.1
+  - fumadocs-openapi@11.0.1

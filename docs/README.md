@@ -7,7 +7,7 @@ This directory includes a Next.js project built with [Fumadocs](https://github.c
 Run development server:
 
 ```bash
-bun dev
+pnpm dev
 ```
 
 Open http://localhost:3000 with your browser to see the result.
@@ -18,7 +18,7 @@ In the project, you can see:
 
 - `lib/source.ts`: Code for content source adapter, `loader()` provides the interface to access your content.
 - `lib/layout.shared.tsx`: Shared options for layouts, optional but preferred to keep.
-- `lib/openapi.yml`: The source file of the CKAN Actions API (v3) in an OpenAPI format which is then used in a script by running `bun ./scripts/generate-docs.ts` to generate the relevant docs files in `content/docs`.
+- `lib/openapi.yml`: The source file of the CKAN Actions API (v3) in an OpenAPI format which is then used in a script by running `pnpx ts-node ./scripts/generate-docs.ts` to generate the relevant docs files in `content/docs`.
 
 | Route                     | Description                                            |
 | ------------------------- | ------------------------------------------------------ |

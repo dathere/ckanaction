@@ -2,13 +2,19 @@ import { docs } from "fumadocs-mdx:collections/server";
 import { type InferPageType, loader } from "fumadocs-core/source";
 import { lucideIconsPlugin } from "fumadocs-core/source/lucide-icons";
 import { openapiPlugin } from "fumadocs-openapi/server";
+import { openapi } from '@/lib/openapi';
 
 // See https://fumadocs.dev/docs/headless/source-api for more info
 export const source = loader({
-  baseUrl: "/docs",
-  source: docs.toFumadocsSource(),
-  plugins: [lucideIconsPlugin(), openapiPlugin()],
-});
+  docs: docs.toFumadocsSource(),
+  openapi: await openapi.staticSource({
+    baseDir: "openapi"
+  }),
+},
+  {
+    baseUrl: "/docs",
+    plugins: [lucideIconsPlugin(), openapiPlugin()],
+  });
 
 export function getPageImage(page: InferPageType<typeof source>) {
   const segments = [...page.slugs, "image.png"];
