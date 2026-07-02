@@ -1732,4 +1732,80 @@ impl CKAN {
     ) -> Result<serde_json::Value, CKANError> {
         post!(&self, "api_token_revoke", (json token), jti)
     }
+
+    /// https://docs.ckan.org/en/latest/api/index.html#ckan.logic.action.file.file_create
+    #[builder]
+    pub async fn file_create(
+        &self,
+        name: Option<String>,
+        storage: Option<String>,
+        upload: Option<PathBuf>,
+    ) -> Result<serde_json::Value, CKANError> {
+        post!(&self, "file_create", name, storage; (upload upload))
+    }
+
+    /// https://docs.ckan.org/en/latest/api/index.html#ckan.logic.action.file.file_register
+    #[builder]
+    pub async fn file_register(
+        &self,
+        location: Option<String>,
+        storage: Option<String>,
+    ) -> Result<serde_json::Value, CKANError> {
+        post!(&self, "file_register", location, storage)
+    }
+
+    /// https://docs.ckan.org/en/latest/api/index.html#ckan.logic.action.file.file_delete
+    #[builder]
+    pub async fn file_delete(&self, id: Option<String>) -> Result<serde_json::Value, CKANError> {
+        post!(&self, "file_delete", id)
+    }
+
+    /// https://docs.ckan.org/en/latest/api/index.html#ckan.logic.action.file.file_show
+    #[builder]
+    pub async fn file_show(&self, id: Option<String>) -> Result<serde_json::Value, CKANError> {
+        post!(&self, "file_show", id)
+    }
+
+    /// https://docs.ckan.org/en/latest/api/index.html#ckan.logic.action.file.file_rename
+    #[builder]
+    pub async fn file_rename(
+        &self,
+        id: Option<String>,
+        name: Option<String>,
+    ) -> Result<serde_json::Value, CKANError> {
+        post!(&self, "file_rename", id, name)
+    }
+
+    /// https://docs.ckan.org/en/latest/api/index.html#ckan.logic.action.file.file_pin
+    #[builder]
+    pub async fn file_pin(&self, id: Option<String>) -> Result<serde_json::Value, CKANError> {
+        post!(&self, "file_pin", id)
+    }
+
+    /// https://docs.ckan.org/en/latest/api/index.html#ckan.logic.action.file.file_unpin
+    #[builder]
+    pub async fn file_unpin(&self, id: Option<String>) -> Result<serde_json::Value, CKANError> {
+        post!(&self, "file_unpin", id)
+    }
+
+    /// https://docs.ckan.org/en/latest/api/index.html#ckan.logic.action.file.file_ownership_transfer
+    #[builder]
+    pub async fn file_ownership_transfer(
+        &self,
+        id: Option<String>,
+        owner_id: Option<String>,
+        owner_type: Option<String>,
+        force: Option<bool>,
+        pin: Option<bool>,
+    ) -> Result<serde_json::Value, CKANError> {
+        post!(
+            &self,
+            "file_ownership_transfer",
+            id,
+            owner_id,
+            owner_type,
+            force,
+            pin
+        )
+    }
 }
