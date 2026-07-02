@@ -127,7 +127,9 @@ impl CKAN {
             let mut form = reqwest::multipart::Form::new();
             if let Some(body_as_value) = body {
                 for entry in body_as_value.as_object().unwrap().iter() {
-                    form = form.text(entry.0.to_owned(), entry.1.as_str().unwrap().to_owned());
+                    if let Some(value) = entry.1.as_str() {
+                        form = form.text(entry.0.to_owned(), value.to_owned());
+                    }
                 }
             }
             form = form.file("upload", file_pathbuf).await?;
