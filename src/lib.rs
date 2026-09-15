@@ -1810,35 +1810,35 @@ impl CKAN {
             pin
         )
     }
-}
 
-/// https://gztr.dathere.com/docs/api-reference/action-api/gztr_collection_create
-#[cfg(feature = "gztr")]
-#[builder]
-pub async fn gztr_collection_create(
-    &self,
-    name: String,
-    upload: Option<PathBuf>,
-) -> Result<serde_json::Value, CKANError> {
-    post!(&self, "gztr_collection_create", (json name); (upload upload))
-}
+    /// https://gztr.dathere.com/docs/api-reference/action-api/gztr_collection_create
+    #[cfg(feature = "gztr")]
+    #[builder]
+    pub async fn gztr_collection_create(
+        &self,
+        name: String,
+        upload: Option<PathBuf>,
+    ) -> Result<serde_json::Value, CKANError> {
+        post!(&self, "gztr_collection_create", (json name); (upload upload))
+    }
 
-/// https://gztr.dathere.com/docs/api-reference/action-api/gztr_spatial_full_with_geometry
-#[cfg(feature = "gztr")]
-#[builder]
-pub async fn gztr_spatial_full_with_geometry(
-    &self,
-    spatial_full: String,
-) -> Result<serde_json::Value, CKANError> {
-    post!(&self, "gztr_spatial_full_with_geometry", (json spatial_full))
-}
+    /// https://gztr.dathere.com/docs/api-reference/action-api/gztr_spatial_full_with_geometry
+    #[cfg(feature = "gztr")]
+    #[builder]
+    pub async fn gztr_spatial_full_with_geometry(
+        &self,
+        spatial_full: String,
+    ) -> Result<serde_json::Value, CKANError> {
+        post!(&self, "gztr_spatial_full_with_geometry", (json spatial_full))
+    }
 
-/// https://gztr.dathere.com/docs/api-reference/action-api/gztr_geoconnex_dataset_jsonld
-#[cfg(feature = "gztr")]
-#[builder]
-pub async fn gztr_geoconnex_dataset_jsonld(
-    &self,
-    id: String,
-) -> Result<serde_json::Value, CKANError> {
-    post!(&self, "gztr_geoconnex_dataset_jsonld", (json id))
+    /// https://gztr.dathere.com/docs/api-reference/action-api/gztr_geoconnex_dataset_jsonld
+    #[cfg(feature = "gztr")]
+    #[builder]
+    pub async fn gztr_geoconnex_dataset_jsonld(
+        &self,
+        id: String,
+    ) -> Result<serde_json::Value, CKANError> {
+        post!(&self, "gztr_geoconnex_dataset_jsonld", (json id))
+    }
 }
