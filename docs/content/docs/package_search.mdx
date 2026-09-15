@@ -10,53 +10,31 @@ _openapi:
   structuredData:
     headings: []
     contents:
-      - content: >
+      - content: |
           Searches for packages satisfying a given search criteria.
 
-
-          This action accepts Solr search query parameters (details below), and
-          returns a dictionary of results, including dictized datasets that
-          match the search criteria, a search count, and also facet information.
-
+          This action accepts Solr search query parameters (details below), and returns a dictionary of results, including dictized datasets that match the search criteria, a search count, and also facet information.
 
           Solr Parameters:
 
-
-          For more in depth treatment of each parameter, please read the [Solr
-          Documentation](https://solr.apache.org/guide/6_6/common-query-parameters.html).
-
+          For more in depth treatment of each parameter, please read the [Solr Documentation](https://solr.apache.org/guide/6_6/common-query-parameters.html).
 
           This action accepts a subset of Solr's search query parameters.
 
-
-          The following advanced Solr parameters are supported as well. Note
-          that some of these are only available on particular Solr versions. See
-          Solr's dismax and edismax documentation for further details on them:
-
+          The following advanced Solr parameters are supported as well. Note that some of these are only available on particular Solr versions. See Solr's dismax and edismax documentation for further details on them:
 
           `qf`, `wt`, `bf`, `boost`, `tie`, `defType`, `mm`
 
-
           Examples:
 
-
-          - `q=flood` datasets containing the word *flood*, *floods*, or
-          *flooding*
-
+          - `q=flood` datasets containing the word *flood*, *floods*, or *flooding*
           - `fq=tags:economy` datasets with the tag *economy*
-
           - `facet.field=["tags"] facet.limit=10 rows=0` top 10 tags
 
-
           <Callout title="Title" type="error">
+          There is an issue for the Body dropdown within this UI where an empty object `{}` is set for the `facet` field.
 
-          There is an issue for the Body dropdown within this UI where an empty
-          object `{}` is set for the `facet` field.
-
-
-          Please either remove this field by clicking "Open JSON editor" in the
-          Body dropdown or set it to `true` (the default value) or `false`.
-
+          Please either remove this field by clicking "Open JSON editor" in the Body dropdown or set it to `true` (the default value) or `false`.
           </Callout>
 ---
 

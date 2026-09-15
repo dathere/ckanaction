@@ -4,7 +4,6 @@
 import { cva } from "class-variance-authority";
 import { CodeBlock } from "fumadocs-ui/components/codeblock";
 import defaultMdxComponents from "fumadocs-ui/mdx";
-import { twMerge as cn } from "tailwind-merge";
 import {
   BlocksIcon,
   GiftIcon,
@@ -18,6 +17,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { type HTMLProps, type ReactNode, useState } from "react";
+import { twMerge as cn } from "tailwind-merge";
 import { Pre } from "@/components/codeblock";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { RainbowButton } from "@/components/ui/rainbow-button";

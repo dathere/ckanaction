@@ -1,4 +1,4 @@
-import { createMDX } from 'fumadocs-mdx/next';
+import { createMDX } from "fumadocs-mdx/next";
 
 const withMDX = createMDX();
 
@@ -11,10 +11,10 @@ const config = {
     return [
       {
         source: "/docs/:path*.mdx",
-        destination: "/llms.mdx/:path*"
-      }
-    ]
-  }
+        destination: "/llms.mdx/:path*",
+      },
+    ];
+  },
 };
 
 export default withMDX(config);

@@ -2,6 +2,16 @@
 
 This directory includes a Next.js project built with [Fumadocs](https://github.com/fuma-nama/fumadocs) for documentation of ckanaction. The documentation can be viewed at [ckanaction.dathere.com](https://ckanaction.dathere.com).
 
+## Generate the OpenAPI pages
+
+Make sure you are in the `docs` root directory, then run (with pnpm installed and development packages installed including `tsx`):
+
+```bash
+pnpm tsx ./scripts/generate-docs.ts
+```
+
+Ensure that your new API endpoints have double quotes surrounding the description if a colon or apostrophe is involved or you'll get an error.
+
 ## Development
 
 Run development server:

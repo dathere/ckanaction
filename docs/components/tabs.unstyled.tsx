@@ -1,11 +1,11 @@
 "use client";
 
 import * as Primitive from "@radix-ui/react-tabs";
-import { useEffectEvent } from "react";
 import {
   type ComponentProps,
   createContext,
   useContext,
+  useEffectEvent,
   useLayoutEffect,
   useMemo,
   useRef,

@@ -1,5 +1,5 @@
-import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { GiftIcon } from 'lucide-react';
+import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
+import { GiftIcon } from "lucide-react";
 
 /**
  * Shared layout configurations
@@ -20,6 +20,6 @@ export function baseOptions(): BaseLayoutProps {
     },
     // see https://fumadocs.dev/docs/ui/navigation/links
     links: [],
-    githubUrl: "https://github.com/dathere/ckanaction"
+    githubUrl: "https://github.com/dathere/ckanaction",
   };
 }

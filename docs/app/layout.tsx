@@ -1,7 +1,7 @@
 import "@/app/global.css";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import { Inter } from "next/font/google";
-import Script from "next/script";
+import { DatHereAnalyticsScript } from "@/components/dathere-analytics-script";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -13,11 +13,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
       <body className="flex flex-col min-h-screen">
         <RootProvider>
           {children}
-          <Script
-            src="https://mk-analytics.dathere.com/api/script.js"
-            data-site-id="10"
-            strategy="afterInteractive"
-          />
+          <DatHereAnalyticsScript />
         </RootProvider>
       </body>
     </html>

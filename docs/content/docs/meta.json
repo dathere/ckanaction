@@ -1,12 +1,6 @@
 {
     "pages": [
-        "--- ---",
-        "index",
-        "---🎁 Interactive CKAN API GUI---",
         "...",
-        "--- ---",
-        "[Source Code](https://github.com/dathere/ckanaction)",
-        "[Support and Feedback](https://support.dathere.com)",
-        "[Privacy Policy](https://dathere.com/privacy-policy/)"
+        "external:[Privacy Policy](https://dathere.com/privacy-policy/)"
     ]
 }

@@ -1,8 +1,8 @@
 @import "tailwindcss";
-@import 'fumadocs-ui/css/neutral.css';
+@import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/ocean.css";
 @import "fumadocs-ui/css/preset.css";
-@import 'fumadocs-openapi/css/preset.css';
+@import "fumadocs-openapi/css/preset.css";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -53,11 +53,11 @@
   --color-color-2: var(--color-2);
   --color-color-1: var(--color-1);
   @keyframes rainbow {
-  0% {
-    background-position: 0%;
+    0% {
+      background-position: 0%;
     }
-  100% {
-    background-position: 200%;
+    100% {
+      background-position: 200%;
     }
   }
 }
