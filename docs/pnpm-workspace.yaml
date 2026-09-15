@@ -1,12 +1,6 @@
+# To prevent error: https://nextjs-forum.com/post/1486702171046281330
+packages: 
+  - .
+
 allowBuilds:
   esbuild: true
-minimumReleaseAgeExclude:
-  - '@fumadocs/api-docs@0.2.9'
-  - '@fumari/stf@1.1.1'
-  - fumadocs-mdx@15.4.1
-  - fumadocs-openapi@11.4.3
-  - '@fumadocs/tailwind@0.1.2'
-  - '@fumari/image-size@0.1.1'
-  - '@types/node@26.6.0'
-  - fumadocs-core@16.15.11
-  - fumadocs-ui@16.15.11
