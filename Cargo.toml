@@ -11,14 +11,14 @@ categories = ["api-bindings", "asynchronous"]
 exclude = ["/docs"]
 
 [dependencies]
-bon = "3.10.1"
+bon = "3.10.2"
 reqwest = { version = "0.12.28", features = ["json", "multipart", "stream"] }
 serde = "1.0.229"
-serde_json = "1.0.151"
-thiserror = "2.0.20"
+serde_json = "1.0.154"
+thiserror = "2.0.21"
 
 [dev-dependencies]
-tokio = { version = "1.53.1", features = ["full"] }
+tokio = { version = "1.54.1", features = ["full"] }
 
 [features]
 gztr = []
